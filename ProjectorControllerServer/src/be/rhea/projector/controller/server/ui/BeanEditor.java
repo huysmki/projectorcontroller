@@ -9,13 +9,13 @@ import javax.swing.JTable;
 
 public class BeanEditor extends JPanel {
 	private static final long serialVersionUID = -3986474952940035967L;
-	protected JTable table;
+	protected PropertyTable table;
 	protected AnnotationPropertyTableData data;
 
 	public BeanEditor() {
 		this.setLayout(new BorderLayout());
 		this.setBounds(10,10, 300, 300);
-		table = new JTable();
+		table = new PropertyTable();
 		JScrollPane ps = new JScrollPane();
 		ps.getViewport().add(table);
 		this.add(ps, BorderLayout.CENTER);
@@ -24,8 +24,7 @@ public class BeanEditor extends JPanel {
 	
 	public void setObject(Object bean) {
 		data = new AnnotationPropertyTableData(bean, table);
-		table.setModel(data);
-		
+		table.setPropertyTableData(data);
 	}
 
 	public void propertyChange(PropertyChangeEvent evt) {

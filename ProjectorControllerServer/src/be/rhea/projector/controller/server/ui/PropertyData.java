@@ -2,16 +2,18 @@ package be.rhea.projector.controller.server.ui;
 
 import java.lang.reflect.Field;
 
+import be.rhea.projector.controller.server.annotation.EditableProperty.Type;
+
 public class PropertyData {
 	private String name;
-	private String type;
+	private Type type;
 	private Field field;
 
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	public void setType(String type) {
+	public void setType(Type type) {
 		this.type = type;
 	}
 
@@ -23,7 +25,7 @@ public class PropertyData {
 		return name;
 	}
 
-	public String getType() {
+	public Type getType() {
 		return type;
 	}
 

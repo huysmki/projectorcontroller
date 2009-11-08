@@ -5,9 +5,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EditableProperty {
+	public enum Type { TEXT, COLOR }
 	String name();
-	String type() default "text";
+	Type type() default Type.TEXT;
 }
