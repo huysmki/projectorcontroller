@@ -157,6 +157,7 @@ public class ProjectorControllerServer {
 	  tree.setScrollsOnExpand(true);
 	  splitpane.setLeftComponent(scrollPane);
 	  splitpane.setDividerLocation(400);
+	  splitpane.setResizeWeight(1);
 	  
 	  final BeanEditor beanEditor = new BeanEditor();
 	  splitpane.setRightComponent(beanEditor);
