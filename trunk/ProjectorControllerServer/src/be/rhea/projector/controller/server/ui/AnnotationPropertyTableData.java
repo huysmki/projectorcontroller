@@ -8,12 +8,19 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+import javax.swing.AbstractCellEditor;
+import javax.swing.DefaultCellEditor;
+import javax.swing.JButton;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 
 import be.rhea.projector.controller.server.annotation.EditableProperty;
+import be.rhea.projector.controller.server.annotation.EditableProperty.Type;
 
-public class AnnotationPropertyTableData extends AbstractTableModel {
+public class AnnotationPropertyTableData extends AbstractTableModel  {
 	private static final long serialVersionUID = 1L;
 	private final Object bean;
 	private final JTable table;
@@ -86,7 +93,7 @@ public class AnnotationPropertyTableData extends AbstractTableModel {
 			Field field = data.getField();
 			field.setAccessible(true);
 			try {
-					return objToString(field.get(bean));
+				return objToString(field.get(bean));
 			} catch (IllegalArgumentException e) {
 				//TODO error handling
 				e.printStackTrace();
@@ -182,4 +189,27 @@ public class AnnotationPropertyTableData extends AbstractTableModel {
 			i[k] = Integer.parseInt(tokenizer.nextToken());
 		return i;
 	}
+
+	public TableCellRenderer getCellRenderer(int row, int column) {
+		if (column == 1) {
+			PropertyData propertyData = editableProperties.get(row);
+			if (propertyData.getType() == Type.COLOR) {
+				DefaultTableCellRenderer defaultTableCellRenderer = new DefaultTableCellRenderer();
+				defaultTableCellRenderer.setBackground((Color) stringToObj((String) getValueAt(row, column), Color.class));
+				return defaultTableCellRenderer;
+			}
+		}
+		return null;
+	}
+
+	public TableCellEditor getCellEditor(int row, int column) {
+		if (column == 1) {
+			PropertyData propertyData = editableProperties.get(row);
+			if (propertyData.getType() == Type.COLOR) {
+				return (TableCellEditor) new ButtonTableCellEditor((Color) stringToObj((String) getValueAt(row, column), Color.class));
+			}
+		}
+		return null;
+	}
+
 }
