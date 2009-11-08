@@ -2,9 +2,13 @@ package be.rhea.projector.controller.server.scenario.actions;
 
 import java.io.Serializable;
 
+import be.rhea.projector.controller.server.annotation.EditableProperty;
+
 public abstract class AbstractAction implements Serializable {
 	private static final long serialVersionUID = 4979938776387446471L;
+	@EditableProperty(name = "Name")
 	protected String name;
+	@EditableProperty(name = "Client")
 	private int clientId;
 	
 	public AbstractAction(String name, int clientId) {
