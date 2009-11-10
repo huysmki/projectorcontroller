@@ -2,14 +2,12 @@ package be.rhea.projector.controller.server.scenario;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Scenario implements Serializable {
 	private static final long serialVersionUID = -8814846705485562162L;
 	private List<Scene> scenes = new ArrayList<Scene>();
-	private Map<Integer, Client> clients = new HashMap<Integer, Client>();
+	private List<Client> clients = new ArrayList<Client>();
 	private String name;
 
 	public Scenario() {
@@ -24,8 +22,8 @@ public class Scenario implements Serializable {
 		return this;
 	}
 
-	public Scenario addClient(int clientId, Client client) {
-		clients.put(clientId, client);
+	public Scenario addClient(Client client) {
+		clients.add(client);
 		return this;
 	}
 	
@@ -45,12 +43,13 @@ public class Scenario implements Serializable {
 		this.name = name;
 	}
 
-	public Map<Integer, Client> getClients() {
+	public List<Client> getClients() {
 		return clients;
 	}
 
-	public void setClients(Map<Integer, Client> clients) {
-		this.clients.putAll(clients);
+	public void setClients(List<Client> clients) {
+		this.clients.clear();
+		this.clients.addAll(clients);
 	}
 	
 	@Override

@@ -6,6 +6,8 @@ import be.rhea.projector.controller.server.annotation.EditableProperty;
 
 public class Client implements Serializable {
 	private static final long serialVersionUID = 2816548312557512167L;
+	@EditableProperty(name = "Id")
+	private int id;
 	@EditableProperty(name = "Name")
 	private String name;
 	@EditableProperty(name = "Host")
@@ -16,7 +18,8 @@ public class Client implements Serializable {
 	public Client() {
 	}
 
-	public Client(String name, String host, int port) {
+	public Client(int id, String name, String host, int port) {
+		this.id = id;
 		this.name = name;
 		this.host = host;
 		this.port = port;
@@ -48,6 +51,14 @@ public class Client implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "Client " + name + " on " + host + ":" + port;
+		return "Client " + name;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 }

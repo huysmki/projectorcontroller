@@ -2,7 +2,7 @@ package be.rhea.projector.controller.server.scenario.actions;
 
 import be.rhea.remote.PCP;
 
-public class PlayImageAction extends AbstractAction {
+public class PlayImageAction extends AbstractClientAction {
 	private static final long serialVersionUID = -210805641078411328L;
 
 	public PlayImageAction() {

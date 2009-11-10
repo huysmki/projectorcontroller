@@ -23,6 +23,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 import be.rhea.projector.controller.remote.commands.client.PCPMediaTarFileTransferClientCommand;
@@ -42,6 +43,7 @@ import be.rhea.projector.controller.server.scenario.actions.SleepAction;
 import be.rhea.projector.controller.server.scenario.actions.StopVideoAction;
 import be.rhea.projector.controller.server.scenario.actions.TransitionColorAction;
 import be.rhea.projector.controller.server.ui.BeanEditor;
+import be.rhea.projector.controller.server.ui.ScenarioTree;
 import be.rhea.remote.PCP;
 import be.rhea.remote.client.SimpleProtocolTCPClient;
 
@@ -56,13 +58,13 @@ public class ProjectorControllerServer {
 	 */
 	public static void main(String[] args) throws Exception {
 		
-	  Client client1 = new Client("Client1", "localhost", 9000);
-	  Client client2 = new Client("Client2", "localhost", 9001);
-	  Client client3 = new Client("Client3", "localhost", 9002);
+	  Client client1 = new Client(1, "Client1", "localhost", 9000);
+	  Client client2 = new Client(2, "Client2", "localhost", 9001);
+	  Client client3 = new Client(3, "Client3", "localhost", 9002);
 	  final Scenario scenario1 = new Scenario("Demo 2");
-	  scenario1.addClient(1, client1);
-	  scenario1.addClient(2, client2);
-	  scenario1.addClient(3, client3);
+	  scenario1.addClient(client1);
+	  scenario1.addClient(client2);
+	  scenario1.addClient(client3);
 	  
 	  scenario1.addScene(new Scene("Intro").addScenePart(new ScenePart("Scene 1").addAction(new ColorAction("wit",1, new Color(255,255,255))).addAction(new ColorAction("rood",2, new Color(255,0,0)))));
 	  scenario1.addScene(new Scene("Intro").addScenePart(new ScenePart("Scene 2")));
@@ -150,69 +152,18 @@ public class ProjectorControllerServer {
 	  JSplitPane splitpane = new JSplitPane();
 	  contentPane.add(splitpane, BorderLayout.CENTER);
 	  
+	  final BeanEditor beanEditor = new BeanEditor();
+	  splitpane.setRightComponent(beanEditor);
+
 	  JScrollPane scrollPane = new JScrollPane();
-	  final JTree tree = new JTree();
+	  final ScenarioTree tree = new ScenarioTree(beanEditor);
 	  tree.setSize(600, 300);
 	  scrollPane.getViewport().add(tree);
-	  tree.setScrollsOnExpand(true);
 	  splitpane.setLeftComponent(scrollPane);
 	  splitpane.setDividerLocation(400);
 	  splitpane.setResizeWeight(1);
 	  
-	  final BeanEditor beanEditor = new BeanEditor();
-	  splitpane.setRightComponent(beanEditor);
-	  
-	  tree.addMouseListener(new MouseAdapter() {
-
-		@Override
-		public void mousePressed(MouseEvent event) {
-			if (event.getButton() == MouseEvent.BUTTON1) {
-				TreePath selectionPath = tree.getSelectionPath();
-				if (selectionPath != null) {
-					Object lastPathComponent = selectionPath.getLastPathComponent();
-					if (lastPathComponent != null) {
-						if (lastPathComponent instanceof DefaultMutableTreeNode) {
-							DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) lastPathComponent;
-							beanEditor.setObject(treeNode.getUserObject());
-						}
-					}
-				}
-			}
-			
-		}
-
-	  });
-	  DefaultMutableTreeNode scenarioItem = new DefaultMutableTreeNode(scenario1);
-
-	  DefaultMutableTreeNode clientsItem = new DefaultMutableTreeNode("Clients");
-	  scenarioItem.add(clientsItem);
-	  Set<Integer> clientKeys = scenario1.getClients().keySet();
-	  for (Integer clientId : clientKeys) {
-		  DefaultMutableTreeNode newClientItem = new DefaultMutableTreeNode(scenario1.getClients().get(clientId));
-		  clientsItem.add(newClientItem);
-	}
-
-	  DefaultMutableTreeNode sceneItem = new DefaultMutableTreeNode("Scenes");
-	  scenarioItem.add(sceneItem);
-
-		List<Scene> scenes = scenario1.getScenes();
-		for (Scene scene: scenes) {
-			DefaultMutableTreeNode newSceneItem = new DefaultMutableTreeNode(scene);
-			sceneItem.add(newSceneItem);
-			List<ScenePart> sceneParts = scene.getSceneParts();
-			for (ScenePart scenePart : sceneParts) {
-				DefaultMutableTreeNode newScenePartItem = new DefaultMutableTreeNode(scenePart);
-				newSceneItem.add(newScenePartItem);
-				
-				List<AbstractAction> actions = scenePart.getActions();
-				for (AbstractAction action : actions) {
-					DefaultMutableTreeNode newActionItem = new DefaultMutableTreeNode(action);
-					newScenePartItem.add(newActionItem);
-				}
-			}
-		}
-
-	  tree.setModel(new DefaultTreeModel(scenarioItem));
+	  tree.setScenario(scenario1);
 	  
 	  button1.addActionListener(new ActionListener(){
 			@Override
