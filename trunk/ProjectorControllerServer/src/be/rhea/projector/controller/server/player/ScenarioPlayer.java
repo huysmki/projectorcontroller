@@ -11,6 +11,7 @@ import be.rhea.projector.controller.server.scenario.Scenario;
 import be.rhea.projector.controller.server.scenario.Scene;
 import be.rhea.projector.controller.server.scenario.ScenePart;
 import be.rhea.projector.controller.server.scenario.actions.AbstractAction;
+import be.rhea.projector.controller.server.scenario.actions.AbstractClientAction;
 import be.rhea.projector.controller.server.scenario.actions.ManualAcknownledgeAction;
 import be.rhea.projector.controller.server.scenario.actions.SleepAction;
 import be.rhea.remote.PCP;
@@ -26,7 +27,7 @@ public class ScenarioPlayer {
 	}
 
 	public void play(int sceneId) {
-		Map<Integer, Client> clients = scenario.getClients();
+		List<Client> clients = scenario.getClients();
 		
 		Scene scene = scenario.getScenes().get(sceneId);
 		
@@ -34,7 +35,6 @@ public class ScenarioPlayer {
 		for (ScenePart scenePart : sceneParts) {
 			List<AbstractAction> actions = scenePart.getActions();
 			for (AbstractAction action : actions) {
-				Client client = clients.get(action.getClientId());
 				String command = action.getCommand();
 				if (action instanceof SleepAction) {
 					try {
@@ -47,12 +47,23 @@ public class ScenarioPlayer {
 				} else if (action instanceof ManualAcknownledgeAction) {
 					JOptionPane.showMessageDialog(null, "Please Aknowledge");
 				}
-				 else {
+				 else if (action instanceof AbstractClientAction){
+					int clientId = ((AbstractClientAction) action).getClientId();
+					Client client = getClientForId(clients, clientId);
 					sendCommand(client, command, action.getParameters());
 				}
 			}
 		}
 		
+	}
+
+	private Client getClientForId(List<Client> clients, int clientId) {
+		for (Client client : clients) {
+			if (client.getId() == clientId) {
+				return client;
+			}
+		}
+		return null;
 	}
 
 	private void sendCommand(Client client, String command, String[] parameters) {

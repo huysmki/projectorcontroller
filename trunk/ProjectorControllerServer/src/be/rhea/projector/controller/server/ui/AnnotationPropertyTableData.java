@@ -8,9 +8,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-import javax.swing.AbstractCellEditor;
-import javax.swing.DefaultCellEditor;
-import javax.swing.JButton;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -19,16 +16,19 @@ import javax.swing.table.TableCellRenderer;
 
 import be.rhea.projector.controller.server.annotation.EditableProperty;
 import be.rhea.projector.controller.server.annotation.EditableProperty.Type;
+import be.rhea.projector.controller.server.scenario.Client;
 
 public class AnnotationPropertyTableData extends AbstractTableModel  {
 	private static final long serialVersionUID = 1L;
 	private final Object bean;
 	private final JTable table;
 	private ArrayList<PropertyData> editableProperties;
+	private final ArrayList<Client> clients;
 
-	public AnnotationPropertyTableData(Object bean, JTable table) {
+	public AnnotationPropertyTableData(Object bean, JTable table, ArrayList<Client> clients) {
 		this.bean = bean;
 		this.table = table;
+		this.clients = clients;
 		editableProperties = new ArrayList<PropertyData>(); 
 
 		Class<? extends Object> clazz = bean.getClass();
@@ -197,7 +197,10 @@ public class AnnotationPropertyTableData extends AbstractTableModel  {
 				DefaultTableCellRenderer defaultTableCellRenderer = new DefaultTableCellRenderer();
 				defaultTableCellRenderer.setBackground((Color) stringToObj((String) getValueAt(row, column), Color.class));
 				return defaultTableCellRenderer;
-			}
+			} else if (propertyData.getType() == Type.CLIENTS) {
+				ClientsTableCellRenderer clientTableCellRenderer = new ClientsTableCellRenderer(Integer.parseInt((String) getValueAt(row, column)), clients);
+				return clientTableCellRenderer;
+			} 
 		}
 		return null;
 	}
@@ -206,7 +209,11 @@ public class AnnotationPropertyTableData extends AbstractTableModel  {
 		if (column == 1) {
 			PropertyData propertyData = editableProperties.get(row);
 			if (propertyData.getType() == Type.COLOR) {
-				return (TableCellEditor) new ButtonTableCellEditor((Color) stringToObj((String) getValueAt(row, column), Color.class));
+				return (TableCellEditor) new ColorTableCellEditor((Color) stringToObj((String) getValueAt(row, column), Color.class));
+			} else if (propertyData.getType() == Type.FILE) {
+				return (TableCellEditor) new FileTableCellEditor((String) getValueAt(row, column));
+			} else if (propertyData.getType() == Type.CLIENTS) {
+				return (TableCellEditor) new ClientsTableCellEditor(Integer.parseInt((String) getValueAt(row, column)), clients);
 			}
 		}
 		return null;

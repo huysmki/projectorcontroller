@@ -2,12 +2,17 @@ package be.rhea.projector.controller.server.scenario.actions;
 
 import java.awt.Color;
 
+import be.rhea.projector.controller.server.annotation.EditableProperty;
+import be.rhea.projector.controller.server.annotation.EditableProperty.Type;
 import be.rhea.remote.PCP;
 
-public class TransitionColorAction extends AbstractAction {
+public class TransitionColorAction extends AbstractClientAction {
 	private static final long serialVersionUID = -8233884029073198849L;
+	@EditableProperty(name = "From Color", type = Type.COLOR)
 	private Color fromColor;
+	@EditableProperty(name = "To Color", type = Type.COLOR)
 	private Color toColor;
+	@EditableProperty(name = "Time (ms)")
 	private int time;
 
 	public TransitionColorAction() {

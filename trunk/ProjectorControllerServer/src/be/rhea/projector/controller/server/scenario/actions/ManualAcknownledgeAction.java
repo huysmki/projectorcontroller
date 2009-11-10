@@ -3,15 +3,13 @@ package be.rhea.projector.controller.server.scenario.actions;
 public class ManualAcknownledgeAction extends AbstractAction {
 	private static final long serialVersionUID = 4463488314619618843L;
 	public static final String MANUAL_ACKNOWLEDGE = "MANUAL_ACKNOWLEDGE";
-	int time;
 	
 	public ManualAcknownledgeAction() {
-		super(null, 0);
+		super(null);
 	}
 
 	public ManualAcknownledgeAction(String name) {
-		super(name, -1);
-		this.time = time;
+		super(name);
 	}
 
 	@Override

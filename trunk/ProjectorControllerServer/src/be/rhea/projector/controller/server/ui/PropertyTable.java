@@ -5,7 +5,7 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
 public class PropertyTable extends JTable {
-
+	private static final long serialVersionUID = 1L;
 	private AnnotationPropertyTableData data;
 
 	public void setPropertyTableData(AnnotationPropertyTableData data) {

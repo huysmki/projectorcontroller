@@ -8,25 +8,14 @@ public abstract class AbstractAction implements Serializable {
 	private static final long serialVersionUID = 4979938776387446471L;
 	@EditableProperty(name = "Name")
 	protected String name;
-	@EditableProperty(name = "Client")
-	private int clientId;
 	
-	public AbstractAction(String name, int clientId) {
+	public AbstractAction(String name) {
 		this.name = name;
-		this.clientId = clientId;
 	}
 
 	public abstract String getCommand();
 
 	public abstract String[] getParameters();
-
-	public int getClientId() {
-		return clientId;
-	}
-
-	public void setClientId(int clientId) {
-		this.clientId = clientId;
-	}
 
 	public String getName() {
 		return name;
@@ -38,6 +27,6 @@ public abstract class AbstractAction implements Serializable {
 	
 	@Override
 	public String toString() {
-		return " : " + name + (clientId > 0?" on client " + clientId:"");
+		return " : " + name;
 	}
 }
