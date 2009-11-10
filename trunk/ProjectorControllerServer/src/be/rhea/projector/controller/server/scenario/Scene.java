@@ -4,8 +4,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import be.rhea.projector.controller.server.annotation.EditableProperty;
+
 public class Scene implements Serializable {
 	private static final long serialVersionUID = -2077219662539280778L;
+	@EditableProperty(name = "Name")
 	private String name;
 	private List<ScenePart> sceneParts = new ArrayList<ScenePart>();
 	

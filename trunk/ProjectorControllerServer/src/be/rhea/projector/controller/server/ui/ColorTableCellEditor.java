@@ -53,9 +53,13 @@ public class ColorTableCellEditor extends AbstractCellEditor implements
 
 	@Override
 	public void actionPerformed(ActionEvent actionevent) {
-		color = JColorChooser.showDialog(null, "Choose a color", color);
-		textField.setText(colorToString());
-		textField.setBackground(color);
+		Color newColor = JColorChooser.showDialog(null, "Choose a color", color);
+		System.out.println(color);
+		if (newColor != null) {
+			color = newColor;
+			textField.setText(colorToString());
+			textField.setBackground(color);
+		}
 		
 		
 	}

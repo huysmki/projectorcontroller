@@ -1,7 +1,6 @@
 package be.rhea.projector.controller.server.ui;
 
 import java.awt.BorderLayout;
-import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
@@ -25,11 +24,7 @@ public class BeanEditor extends JPanel {
 	}
 
 	public void setObject(Object bean, ArrayList<Client> clients) {
-		data = new AnnotationPropertyTableData(bean, table, clients);
+		data = new AnnotationPropertyTableData(bean, clients);
 		table.setPropertyTableData(data);
-	}
-
-	public void propertyChange(PropertyChangeEvent evt) {
-		data.setProperty(evt.getPropertyName(), evt.getNewValue());
 	}
 }

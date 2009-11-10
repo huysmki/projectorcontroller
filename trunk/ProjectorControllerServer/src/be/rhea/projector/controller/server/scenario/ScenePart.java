@@ -4,10 +4,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import be.rhea.projector.controller.server.annotation.EditableProperty;
 import be.rhea.projector.controller.server.scenario.actions.AbstractAction;
 
 public class ScenePart implements Serializable {
 	private static final long serialVersionUID = -9038476037498350402L;
+	@EditableProperty(name = "Name")
 	private String name;
 	private List<AbstractAction> actions = new ArrayList<AbstractAction>();
 
