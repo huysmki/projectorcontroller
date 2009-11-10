@@ -8,7 +8,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
@@ -21,13 +20,11 @@ import be.rhea.projector.controller.server.scenario.Client;
 public class AnnotationPropertyTableData extends AbstractTableModel  {
 	private static final long serialVersionUID = 1L;
 	private final Object bean;
-	private final JTable table;
 	private ArrayList<PropertyData> editableProperties;
 	private final ArrayList<Client> clients;
 
-	public AnnotationPropertyTableData(Object bean, JTable table, ArrayList<Client> clients) {
+	public AnnotationPropertyTableData(Object bean, ArrayList<Client> clients) {
 		this.bean = bean;
-		this.table = table;
 		this.clients = clients;
 		editableProperties = new ArrayList<PropertyData>(); 
 
@@ -53,16 +50,6 @@ public class AnnotationPropertyTableData extends AbstractTableModel  {
 				editableProperties.add(data);
 			}
 		}
-	}
-
-	public void setProperty(String name, Object value) {
-//		for (int k = 0; k < m_numProps; k++)
-//			if (name.equals(m_properties[k][0])) {
-//				m_properties[k][1] = objToString(value);
-//				table.tableChanged(new TableModelEvent(this, k));
-//				table.repaint();
-//				break;
-//			}
 	}
 
 	public int getRowCount() {

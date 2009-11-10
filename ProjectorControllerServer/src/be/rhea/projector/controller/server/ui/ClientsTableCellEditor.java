@@ -1,19 +1,12 @@
 package be.rhea.projector.controller.server.ui;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Font;
 import java.util.List;
 
 import javax.swing.AbstractCellEditor;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.table.TableCellEditor;
 
 import be.rhea.projector.controller.server.scenario.Client;
@@ -34,6 +27,9 @@ public class ClientsTableCellEditor extends AbstractCellEditor implements
 	public Component getTableCellEditorComponent(JTable jtable, Object obj,
 			boolean flag, int i, int j) {
 		comboBox = new JComboBox();
+		Font font = comboBox.getFont();
+		comboBox.setFont(font.deriveFont(Font.PLAIN));
+		
 		for (Client client : clients) {
 			comboBox.addItem(client);
 			if (client.getId() == clientId) {
