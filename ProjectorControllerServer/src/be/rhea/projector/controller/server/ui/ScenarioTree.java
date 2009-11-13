@@ -1,14 +1,19 @@
 package be.rhea.projector.controller.server.ui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 import be.rhea.projector.controller.server.scenario.Client;
@@ -17,12 +22,14 @@ import be.rhea.projector.controller.server.scenario.Scene;
 import be.rhea.projector.controller.server.scenario.ScenePart;
 import be.rhea.projector.controller.server.scenario.actions.AbstractAction;
 
-public class ScenarioTree extends JTree implements MouseListener {
+public class ScenarioTree extends JTree implements MouseListener, ActionListener {
 	private static final long serialVersionUID = 1L;
+	private static final String REMOVE_CLIENT = "REMOVE_CLIENT";
 	private final BeanEditor beanEditor;
 	private DefaultMutableTreeNode clientsItem;
 	private Object selectedObject;
 	private DefaultMutableTreeNode sceneItem;
+	private DefaultMutableTreeNode selectedTreeNode;
 
 	public ScenarioTree(BeanEditor beanEditor) {
 		this.beanEditor = beanEditor;
@@ -32,8 +39,9 @@ public class ScenarioTree extends JTree implements MouseListener {
 
 	@SuppressWarnings("unchecked")
 	public Scenario getScenario() {
-		Object root = this.getModel().getRoot();
-		if (root != null) {
+		TreeModel model = this.getModel();
+		if (model != null) {
+			Object root = model.getRoot();
 			Scenario scenario = (Scenario) ((DefaultMutableTreeNode) root).getUserObject();
 			scenario.setClients(new ArrayList<Client>());
 			scenario.setScenes(new ArrayList<Scene>());
@@ -126,26 +134,44 @@ public class ScenarioTree extends JTree implements MouseListener {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void mousePressed(MouseEvent mouseEvent) {
-		if (mouseEvent.getButton() == MouseEvent.BUTTON1) {
-			TreePath selectionPath = this.getSelectionPath();
-			if (selectionPath != null) {
-				Object lastPathComponent = selectionPath.getLastPathComponent();
-				if (lastPathComponent != null) {
-					if (lastPathComponent instanceof DefaultMutableTreeNode) {
-						DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) lastPathComponent;
-						ArrayList<Client> clients = new ArrayList<Client>();
-						Enumeration<DefaultMutableTreeNode> children = clientsItem
-								.children();
-						while (children.hasMoreElements()) {
-							clients.add((Client) children.nextElement()
-									.getUserObject());
-						}
-						selectedObject = treeNode.getUserObject();
-						beanEditor.setObject(selectedObject, clients);
-					}
+		
+		TreePath selectionPath = this.getSelectionPath();
+		if (selectionPath != null) {
+			Object lastPathComponent = selectionPath.getLastPathComponent();
+			if (lastPathComponent != null) {
+				if (lastPathComponent instanceof DefaultMutableTreeNode) {
+					selectedTreeNode = (DefaultMutableTreeNode) lastPathComponent;
+					selectedObject = selectedTreeNode.getUserObject();
 				}
 			}
 		}
+		if (selectedObject != null) {
+			if (mouseEvent.getButton() == MouseEvent.BUTTON1) {
+					ArrayList<Client> clients = populateClientsArray();
+					beanEditor.setObject(selectedObject, clients);
+			} else if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
+				JPopupMenu popupMenu = new JPopupMenu();
+				if (selectedObject instanceof Client) {
+					JMenuItem removeMenuItem = new JMenuItem("Remove");
+					removeMenuItem.setActionCommand(REMOVE_CLIENT);
+					removeMenuItem.addActionListener(this);
+					popupMenu.add(removeMenuItem);
+				}
+				popupMenu.show(this, mouseEvent.getX(), mouseEvent.getY());
+			}
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private ArrayList<Client> populateClientsArray() {
+		ArrayList<Client> clients = new ArrayList<Client>();
+		Enumeration<DefaultMutableTreeNode> children = clientsItem
+				.children();
+		while (children.hasMoreElements()) {
+			clients.add((Client) children.nextElement()
+					.getUserObject());
+		}
+		return clients;
 	}
 
 	@Override
@@ -154,5 +180,14 @@ public class ScenarioTree extends JTree implements MouseListener {
 
 	public Object getSelectedObject() {
 		return selectedObject;
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent event) {
+		if (REMOVE_CLIENT.equals(event.getActionCommand())) {
+			//TODO check if client is not in use anymore
+			DefaultTreeModel model = (DefaultTreeModel) this.getModel();
+			model.removeNodeFromParent(selectedTreeNode);
+		}
 	}
 }

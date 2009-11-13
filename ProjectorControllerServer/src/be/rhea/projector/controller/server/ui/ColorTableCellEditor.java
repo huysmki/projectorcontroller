@@ -28,7 +28,6 @@ public class ColorTableCellEditor extends AbstractCellEditor implements
 	@Override
 	public Component getTableCellEditorComponent(JTable jtable, Object obj,
 			boolean flag, int i, int j) {
-		// TODO Auto-generated method stub
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
 		textField = new JTextField(colorToString());
@@ -38,7 +37,9 @@ public class ColorTableCellEditor extends AbstractCellEditor implements
 		JButton button = new JButton("...");
 		button.setPreferredSize(new Dimension(20,20));
 		button.addActionListener(this);
+		button.setFocusable(false);
 		panel.add(button, BorderLayout.EAST);
+		
 		return panel;
 	}
 
@@ -54,7 +55,6 @@ public class ColorTableCellEditor extends AbstractCellEditor implements
 	@Override
 	public void actionPerformed(ActionEvent actionevent) {
 		Color newColor = JColorChooser.showDialog(null, "Choose a color", color);
-		System.out.println(color);
 		if (newColor != null) {
 			color = newColor;
 			textField.setText(colorToString());
