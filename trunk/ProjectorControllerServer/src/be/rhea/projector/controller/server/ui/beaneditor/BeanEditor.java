@@ -32,4 +32,11 @@ public class BeanEditor extends JPanel {
 	public PropertyTable getTable() {
 		return table;
 	}
+
+	public void stopEditing() {
+		if (table.isEditing()) {
+			table.getCellEditor().stopCellEditing();
+		}
+		
+	}
 }
