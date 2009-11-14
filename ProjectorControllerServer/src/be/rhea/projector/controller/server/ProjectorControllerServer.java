@@ -20,6 +20,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
+import be.rhea.projector.controller.server.filefilter.XMLFileFilter;
 import be.rhea.projector.controller.server.player.ScenarioPlayer;
 import be.rhea.projector.controller.server.scenario.Scenario;
 import be.rhea.projector.controller.server.scenario.Scene;
@@ -31,9 +32,10 @@ import be.rhea.projector.controller.server.ui.beaneditor.BeanEditor;
 public class ProjectorControllerServer extends JFrame implements ActionListener {
 	private static final String TITLE = "Projector Controller";
 	private static final long serialVersionUID = 1L;
-	private JMenuItem open;
-	private JMenuItem play;
-	private JMenuItem save;
+	private static final String OPEN = "OPEN";
+	private static final String SAVE = "SAVE";
+	private static final String SAVE_AS = "SAVE_AS";
+	private static final String PLAY_SCENE = "PLAY_SCENE";
 	private ScenarioViewer scenarioViewer;
 	private Scenario currentScenario;
 	private File selectedFile;
@@ -51,7 +53,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener 
 		contentPane.setLayout(new BorderLayout());
 		JSplitPane splitpane = new JSplitPane();
 		contentPane.add(splitpane, BorderLayout.CENTER);
-		final BeanEditor beanEditor = new BeanEditor();
+		BeanEditor beanEditor = new BeanEditor();
 		splitpane.setRightComponent(beanEditor);
 		JScrollPane scrollPane = new JScrollPane();
 		scenarioViewer = new ScenarioViewer(beanEditor);
@@ -61,7 +63,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener 
 		splitpane.setDividerLocation(400);
 		splitpane.setResizeWeight(1);
 		scenarioViewer.setModel(null);
-		// ScenarioTree.setScenario(scenario1);
+
 		this.setSize(800, 600);
 		this.setVisible(true);
 	}
@@ -70,24 +72,33 @@ public class ProjectorControllerServer extends JFrame implements ActionListener 
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
 		JMenu playMenu = new JMenu("Play");
-		open = new JMenuItem("Open...");
-		save = new JMenuItem("Save");
-		play = new JMenuItem("Play Scenario");
+		JMenuItem open = new JMenuItem("Open...");
+		open.setActionCommand(OPEN);
+		JMenuItem save = new JMenuItem("Save");
+		save.setActionCommand(SAVE);
+		JMenuItem saveAs = new JMenuItem("Save As...");
+		saveAs.setActionCommand(SAVE_AS);
+		JMenuItem playScene = new JMenuItem("Play Scene");
+		playScene.setActionCommand(PLAY_SCENE);
 		menuBar.add(fileMenu);
 		fileMenu.add(open);
 		fileMenu.add(save);
-		playMenu.add(play);
+		fileMenu.add(saveAs);
+		playMenu.add(playScene);
 		menuBar.add(playMenu);
 		this.setJMenuBar(menuBar);
 		open.addActionListener(this);
-		play.addActionListener(this);
+		playScene.addActionListener(this);
 		save.addActionListener(this);
+		saveAs.addActionListener(this);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent actionEvent) {
-		if (actionEvent.getSource() == open) {
+		if (OPEN.equals(actionEvent.getActionCommand())) {
 			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.setFileFilter(new XMLFileFilter());
+			fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
 			if (fileChooser.showDialog(this, "Select") == JFileChooser.APPROVE_OPTION) {
 				try {
 					selectedFile = fileChooser.getSelectedFile();
@@ -102,7 +113,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener 
 					e.printStackTrace();
 				}
 			}
-		} else if (actionEvent.getSource() == play) {
+		} else if (PLAY_SCENE.equals(actionEvent.getActionCommand())) {
 			if (scenarioViewer.getSelectedObject() instanceof Scene) {
 				int indexOf = currentScenario.getScenes().indexOf(
 						scenarioViewer.getSelectedObject());
@@ -110,14 +121,32 @@ public class ProjectorControllerServer extends JFrame implements ActionListener 
 				ScenarioPlayer player = new ScenarioPlayer(currentScenario);
 				player.play(indexOf);
 			}
-		} else if (actionEvent.getSource() == save) {
+		} else if (SAVE_AS.equals(actionEvent.getActionCommand())) {
+			try {
+				JFileChooser fileChooser = new JFileChooser();
+				fileChooser.setFileFilter(new XMLFileFilter());
+				fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+				if (fileChooser.showDialog(this, "Save") == JFileChooser.APPROVE_OPTION) {
+					selectedFile = fileChooser.getSelectedFile();
+					Scenario scenario = scenarioViewer.getScenario();
+					XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(
+							new FileOutputStream(selectedFile)));
+					encoder.writeObject(scenario);
+					encoder.close();
+					this.setTitle(TITLE + " " + selectedFile);
+				}
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else if (SAVE.equals(actionEvent.getActionCommand())) {
 			try {
 				Scenario scenario = scenarioViewer.getScenario();
 				XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(
-						new FileOutputStream(new File("c:/temp/Scenario2.xml"))));
+						new FileOutputStream(selectedFile)));
 				encoder.writeObject(scenario);
 				encoder.close();
-				System.out.println(scenario);
+				this.setTitle(TITLE + " " + selectedFile);
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

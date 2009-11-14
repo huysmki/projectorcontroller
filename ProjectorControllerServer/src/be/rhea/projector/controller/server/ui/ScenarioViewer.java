@@ -9,8 +9,11 @@ import java.util.Enumeration;
 import java.util.List;
 
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
@@ -21,11 +24,13 @@ import be.rhea.projector.controller.server.scenario.Scenario;
 import be.rhea.projector.controller.server.scenario.Scene;
 import be.rhea.projector.controller.server.scenario.ScenePart;
 import be.rhea.projector.controller.server.scenario.actions.AbstractAction;
+import be.rhea.projector.controller.server.scenario.actions.AbstractClientAction;
 import be.rhea.projector.controller.server.ui.beaneditor.BeanEditor;
 
-public class ScenarioViewer extends JTree implements MouseListener, ActionListener {
+public class ScenarioViewer extends JTree implements MouseListener, ActionListener, TreeSelectionListener {
 	private static final long serialVersionUID = 1L;
 	private static final String REMOVE_CLIENT = "REMOVE_CLIENT";
+	private static final String ADD_CLIENT = "ADD_CLIENT";
 	private final BeanEditor beanEditor;
 	private DefaultMutableTreeNode clientsItem;
 	private Object selectedObject;
@@ -36,6 +41,7 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 		this.beanEditor = beanEditor;
 		this.setScrollsOnExpand(true);
 		this.addMouseListener(this);
+		this.addTreeSelectionListener(this);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -132,35 +138,31 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 	public void mouseExited(MouseEvent mouseevent) {
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void mousePressed(MouseEvent mouseEvent) {
-		
-		TreePath selectionPath = this.getSelectionPath();
-		if (selectionPath != null) {
-			Object lastPathComponent = selectionPath.getLastPathComponent();
-			if (lastPathComponent != null) {
-				if (lastPathComponent instanceof DefaultMutableTreeNode) {
-					selectedTreeNode = (DefaultMutableTreeNode) lastPathComponent;
-					selectedObject = selectedTreeNode.getUserObject();
-				}
-			}
-		}
 		if (selectedObject != null) {
-			if (mouseEvent.getButton() == MouseEvent.BUTTON1) {
-					ArrayList<Client> clients = populateClientsArray();
-					beanEditor.setObject(selectedObject, clients);
-			} else if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
+			if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
 				JPopupMenu popupMenu = new JPopupMenu();
-				if (selectedObject instanceof Client) {
-					JMenuItem removeMenuItem = new JMenuItem("Remove");
-					removeMenuItem.setActionCommand(REMOVE_CLIENT);
-					removeMenuItem.addActionListener(this);
-					popupMenu.add(removeMenuItem);
-				}
+				populatePopupMenu(popupMenu);
 				popupMenu.show(this, mouseEvent.getX(), mouseEvent.getY());
 			}
 		}
+	}
+
+	private void populatePopupMenu(JPopupMenu popupMenu) {
+		if (selectedObject instanceof Client) {
+			JMenuItem removeClientMenuItem = new JMenuItem("Remove");
+			removeClientMenuItem.setActionCommand(REMOVE_CLIENT);
+			removeClientMenuItem.addActionListener(this);
+			popupMenu.add(removeClientMenuItem);
+		}
+		if (selectedObject instanceof Client || clientsItem == selectedTreeNode) {
+			JMenuItem addClientMenuItem = new JMenuItem("Add Client");
+			addClientMenuItem.setActionCommand(ADD_CLIENT);
+			addClientMenuItem.addActionListener(this);
+			popupMenu.add(addClientMenuItem);
+		}
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -186,9 +188,60 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		if (REMOVE_CLIENT.equals(event.getActionCommand())) {
-			//TODO check if client is not in use anymore
+			Client clientToRemove = (Client)selectedObject;
+			int idToRemove = clientToRemove.getId();
+			List<Scene> scenes = getScenario().getScenes();
+			for (Scene scene : scenes) {
+				List<ScenePart> sceneParts = scene.getSceneParts();
+				for (ScenePart scenePart : sceneParts) {
+					List<AbstractAction> actions = scenePart.getActions();
+					for (AbstractAction action : actions) {
+						if (action instanceof AbstractClientAction && ((AbstractClientAction)action).getClientId() == idToRemove) {
+							JOptionPane.showMessageDialog(null, "Client still used by an Action. Please remove first all usages.", "Error", JOptionPane.ERROR_MESSAGE); 
+							return;
+						}
+					}
+				}
+			}
+			
 			DefaultTreeModel model = (DefaultTreeModel) this.getModel();
 			model.removeNodeFromParent(selectedTreeNode);
+		} else if (ADD_CLIENT.equals(event.getActionCommand())) {
+			int id = 1;
+			ArrayList<Client> clients = populateClientsArray();
+			for (Client client : clients) {
+				if (client.getId() == id) {
+					id++;
+				}
+			}
+			DefaultMutableTreeNode newClientNode = new DefaultMutableTreeNode(new Client(id, "New Client", "host", 9999));
+			clientsItem.add(newClientNode);
+			DefaultTreeModel model = (DefaultTreeModel) this.getModel();
+			if (model != null) {
+				model.nodeStructureChanged(clientsItem);
+			}
 		}
+	}
+
+	@Override
+	public void valueChanged(TreeSelectionEvent event) {
+		beanEditor.stopEditing();
+		DefaultTreeModel model = (DefaultTreeModel) this.getModel();
+		if (model != null && selectedTreeNode != null) {
+			model.nodeChanged(selectedTreeNode);
+		}
+		TreePath selectionPath = event.getNewLeadSelectionPath();
+		if (selectionPath != null) {
+			Object lastPathComponent = selectionPath.getLastPathComponent();
+			if (lastPathComponent != null) {
+				if (lastPathComponent instanceof DefaultMutableTreeNode) {
+					selectedTreeNode = (DefaultMutableTreeNode) lastPathComponent;
+					selectedObject = selectedTreeNode.getUserObject();
+					ArrayList<Client> clients = populateClientsArray();
+					beanEditor.setObject(selectedObject, clients);
+				}
+			}
+		}		
+		
 	}
 }
