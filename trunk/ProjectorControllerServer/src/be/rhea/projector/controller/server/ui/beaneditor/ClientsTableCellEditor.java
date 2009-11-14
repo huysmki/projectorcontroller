@@ -1,4 +1,4 @@
-package be.rhea.projector.controller.server.ui;
+package be.rhea.projector.controller.server.ui.beaneditor;
 
 import java.awt.Component;
 import java.awt.Font;

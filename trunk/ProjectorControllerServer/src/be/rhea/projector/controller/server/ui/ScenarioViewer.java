@@ -21,8 +21,9 @@ import be.rhea.projector.controller.server.scenario.Scenario;
 import be.rhea.projector.controller.server.scenario.Scene;
 import be.rhea.projector.controller.server.scenario.ScenePart;
 import be.rhea.projector.controller.server.scenario.actions.AbstractAction;
+import be.rhea.projector.controller.server.ui.beaneditor.BeanEditor;
 
-public class ScenarioTree extends JTree implements MouseListener, ActionListener {
+public class ScenarioViewer extends JTree implements MouseListener, ActionListener {
 	private static final long serialVersionUID = 1L;
 	private static final String REMOVE_CLIENT = "REMOVE_CLIENT";
 	private final BeanEditor beanEditor;
@@ -31,7 +32,7 @@ public class ScenarioTree extends JTree implements MouseListener, ActionListener
 	private DefaultMutableTreeNode sceneItem;
 	private DefaultMutableTreeNode selectedTreeNode;
 
-	public ScenarioTree(BeanEditor beanEditor) {
+	public ScenarioViewer(BeanEditor beanEditor) {
 		this.beanEditor = beanEditor;
 		this.setScrollsOnExpand(true);
 		this.addMouseListener(this);

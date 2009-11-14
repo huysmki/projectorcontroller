@@ -1,4 +1,4 @@
-package be.rhea.projector.controller.server.ui;
+package be.rhea.projector.controller.server.ui.beaneditor;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
