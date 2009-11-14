@@ -1,12 +1,9 @@
 package be.rhea.projector.controller.server;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.BufferedOutputStream;
@@ -22,14 +19,12 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTable;
 
 import be.rhea.projector.controller.server.player.ScenarioPlayer;
 import be.rhea.projector.controller.server.scenario.Scenario;
 import be.rhea.projector.controller.server.scenario.Scene;
-import be.rhea.projector.controller.server.ui.BeanEditor;
-import be.rhea.projector.controller.server.ui.PropertyTable;
-import be.rhea.projector.controller.server.ui.ScenarioTree;
+import be.rhea.projector.controller.server.ui.ScenarioViewer;
+import be.rhea.projector.controller.server.ui.beaneditor.BeanEditor;
 
 // http://www.eclipse.org/swt/snippets/
 // http://www.cs.umanitoba.ca/~eclipse/2-Basic.pdf
@@ -39,7 +34,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener 
 	private JMenuItem open;
 	private JMenuItem play;
 	private JMenuItem save;
-	private ScenarioTree scenarioTree;
+	private ScenarioViewer scenarioViewer;
 	private Scenario currentScenario;
 	private File selectedFile;
 
@@ -59,13 +54,13 @@ public class ProjectorControllerServer extends JFrame implements ActionListener 
 		final BeanEditor beanEditor = new BeanEditor();
 		splitpane.setRightComponent(beanEditor);
 		JScrollPane scrollPane = new JScrollPane();
-		scenarioTree = new ScenarioTree(beanEditor);
-		scenarioTree.setSize(600, 300);
-		scrollPane.getViewport().add(scenarioTree);
+		scenarioViewer = new ScenarioViewer(beanEditor);
+		scenarioViewer.setSize(600, 300);
+		scrollPane.getViewport().add(scenarioViewer);
 		splitpane.setLeftComponent(scrollPane);
 		splitpane.setDividerLocation(400);
 		splitpane.setResizeWeight(1);
-		scenarioTree.setModel(null);
+		scenarioViewer.setModel(null);
 		// ScenarioTree.setScenario(scenario1);
 		this.setSize(800, 600);
 		this.setVisible(true);
@@ -100,7 +95,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener 
 							selectedFile));
 					currentScenario = (Scenario) decoder.readObject();
 					decoder.close();
-					scenarioTree.setScenario(currentScenario);
+					scenarioViewer.setScenario(currentScenario);
 					this.setTitle(TITLE + " " + selectedFile);
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
@@ -108,16 +103,16 @@ public class ProjectorControllerServer extends JFrame implements ActionListener 
 				}
 			}
 		} else if (actionEvent.getSource() == play) {
-			if (scenarioTree.getSelectedObject() instanceof Scene) {
+			if (scenarioViewer.getSelectedObject() instanceof Scene) {
 				int indexOf = currentScenario.getScenes().indexOf(
-						scenarioTree.getSelectedObject());
+						scenarioViewer.getSelectedObject());
 				System.out.println(indexOf);
 				ScenarioPlayer player = new ScenarioPlayer(currentScenario);
 				player.play(indexOf);
 			}
 		} else if (actionEvent.getSource() == save) {
 			try {
-				Scenario scenario = scenarioTree.getScenario();
+				Scenario scenario = scenarioViewer.getScenario();
 				XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(
 						new FileOutputStream(new File("c:/temp/Scenario2.xml"))));
 				encoder.writeObject(scenario);

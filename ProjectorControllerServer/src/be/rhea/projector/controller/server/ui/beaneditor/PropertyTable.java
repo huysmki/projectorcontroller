@@ -1,4 +1,4 @@
-package be.rhea.projector.controller.server.ui;
+package be.rhea.projector.controller.server.ui.beaneditor;
 
 import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
