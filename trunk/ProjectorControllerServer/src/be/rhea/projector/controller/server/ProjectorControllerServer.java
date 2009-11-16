@@ -12,13 +12,17 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JToolBar;
 
 import be.rhea.projector.controller.server.filefilter.XMLFileFilter;
 import be.rhea.projector.controller.server.player.ScenarioPlayer;
@@ -36,6 +40,8 @@ public class ProjectorControllerServer extends JFrame implements ActionListener 
 	private static final String SAVE = "SAVE";
 	private static final String SAVE_AS = "SAVE_AS";
 	private static final String PLAY_SCENE = "PLAY_SCENE";
+	private static final String PAUSE_SCENE = "PAUSE_SCENE";
+	private static final String STOP_SCENE = "STOP_SCENE";
 	private ScenarioViewer scenarioViewer;
 	private Scenario currentScenario;
 	private File selectedFile;
@@ -49,10 +55,15 @@ public class ProjectorControllerServer extends JFrame implements ActionListener 
 		this.setTitle(TITLE);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		createMenu();
-		Container contentPane = this.getContentPane();
-		contentPane.setLayout(new BorderLayout());
+		JPanel panel = new JPanel();
+		panel.setLayout(new BorderLayout());
+		JToolBar toolbar = createToolBar();
+		toolbar.setFloatable(true);
+		toolbar.setRollover(true);
+		panel.setLayout(new BorderLayout());
+		panel.add(toolbar, BorderLayout.PAGE_START);
 		JSplitPane splitpane = new JSplitPane();
-		contentPane.add(splitpane, BorderLayout.CENTER);
+		panel.add(splitpane, BorderLayout.CENTER);
 		BeanEditor beanEditor = new BeanEditor();
 		splitpane.setRightComponent(beanEditor);
 		JScrollPane scrollPane = new JScrollPane();
@@ -63,9 +74,34 @@ public class ProjectorControllerServer extends JFrame implements ActionListener 
 		splitpane.setDividerLocation(400);
 		splitpane.setResizeWeight(1);
 		scenarioViewer.setModel(null);
+		Container contentPane = this.getContentPane();
+		contentPane.add(panel);
 
 		this.setSize(800, 600);
 		this.setVisible(true);
+	}
+
+	private JToolBar createToolBar() {
+		ImageIcon playIcon = new ImageIcon(this.getClass().getResource("/play.png"));
+		ImageIcon pauseIcon = new ImageIcon(this.getClass().getResource("/pause.png"));
+		ImageIcon stopIcon = new ImageIcon(this.getClass().getResource("/stop.png"));
+		JToolBar toolbar = new JToolBar();
+		JButton playButton = new JButton();
+		playButton.setIcon(playIcon);
+		playButton.setActionCommand(PLAY_SCENE);
+		playButton.addActionListener(this);
+		JButton pauseButton = new JButton();
+		pauseButton.setIcon(pauseIcon);
+		pauseButton.setActionCommand(PAUSE_SCENE);
+		pauseButton.addActionListener(this);
+		JButton stopButton = new JButton();
+		stopButton.setIcon(stopIcon);
+		stopButton.setActionCommand(STOP_SCENE);
+		stopButton.addActionListener(this);
+		toolbar.add(playButton);
+		toolbar.add(pauseButton);
+		toolbar.add(stopButton);
+		return toolbar;
 	}
 
 	private void createMenu() {
@@ -117,10 +153,13 @@ public class ProjectorControllerServer extends JFrame implements ActionListener 
 			if (scenarioViewer.getSelectedObject() instanceof Scene) {
 				int indexOf = currentScenario.getScenes().indexOf(
 						scenarioViewer.getSelectedObject());
-				System.out.println(indexOf);
-				ScenarioPlayer player = new ScenarioPlayer(currentScenario);
-				player.play(indexOf);
+				ScenarioPlayer.setScenario(currentScenario);
+				ScenarioPlayer.play(indexOf);
 			}
+		} else if (PAUSE_SCENE.equals(actionEvent.getActionCommand())) {
+				ScenarioPlayer.pause();
+		} else if (STOP_SCENE.equals(actionEvent.getActionCommand())) {
+				ScenarioPlayer.stop();
 		} else if (SAVE_AS.equals(actionEvent.getActionCommand())) {
 			try {
 				JFileChooser fileChooser = new JFileChooser();

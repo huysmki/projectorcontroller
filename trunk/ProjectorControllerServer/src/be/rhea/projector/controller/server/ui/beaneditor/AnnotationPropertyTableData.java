@@ -201,6 +201,8 @@ public class AnnotationPropertyTableData extends AbstractTableModel  {
 				return (TableCellEditor) new FileTableCellEditor((String) getValueAt(row, column));
 			} else if (propertyData.getType() == Type.CLIENTS) {
 				return (TableCellEditor) new ClientsTableCellEditor(Integer.parseInt((String) getValueAt(row, column)), clients);
+			} else if (propertyData.getType() == Type.IP) {
+				return (TableCellEditor) new IPTableCellEditor((String) getValueAt(row, column));
 			}
 		}
 		return null;

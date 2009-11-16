@@ -30,15 +30,20 @@ public class SimpleProtocolUDPClient extends SimpleProtocolClient {
 		
 		return "OK";
 	}
+	
+    	
 
 	private void sendData(String data) throws SocketException,
 			UnknownHostException, IOException {
 		DatagramSocket datagramSocket = new DatagramSocket();
-		byte[] inetaddress = new byte[4];
-		inetaddress[0] = (byte) 0xFF;
-		inetaddress[1] = (byte) 0xFF;
-		inetaddress[2] = (byte) 0xFF;
-		inetaddress[3] = (byte) 0xFF;
+		InetAddress a = InetAddress.getByName(host);
+	    byte[] inetaddress = a.getAddress();
+	    
+//		byte[] inetaddress = new byte[4];
+//		inetaddress[0] = (byte) 0xFF;
+//		inetaddress[1] = (byte) 0xFF;
+//		inetaddress[2] = (byte) 0xFF;
+//		inetaddress[3] = (byte) 0xFF;
 //		inetaddress[0] = (byte) 10;
 //		inetaddress[1] = (byte) 0;
 //		inetaddress[2] = (byte) 2;

@@ -3,6 +3,7 @@ package be.rhea.projector.controller.server.scenario;
 import java.io.Serializable;
 
 import be.rhea.projector.controller.server.annotation.EditableProperty;
+import be.rhea.projector.controller.server.annotation.EditableProperty.Type;
 
 public class Client implements Serializable {
 	private static final long serialVersionUID = 2816548312557512167L;
@@ -10,7 +11,7 @@ public class Client implements Serializable {
 	private int id;
 	@EditableProperty(name = "Name")
 	private String name;
-	@EditableProperty(name = "Host")
+	@EditableProperty(name = "Host", type=Type.IP)
 	private String host;
 	@EditableProperty(name = "Port")
 	private int port;
