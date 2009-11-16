@@ -42,7 +42,7 @@ public class ColorTableCellEditor extends AbstractCellEditor implements
 		
 		return panel;
 	}
-
+	
 	@Override
 	public Object getCellEditorValue() {
 		return colorToString();
