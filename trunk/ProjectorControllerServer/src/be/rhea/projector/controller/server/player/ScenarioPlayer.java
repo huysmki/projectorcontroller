@@ -59,9 +59,9 @@ public class ScenarioPlayer implements Runnable {
 		}
 		isPaused = !isPaused;
 		if (isPaused) {
-			fireStateChangeListeners(new StateChangedEvent(State.PLAY));
-		} else {
 			fireStateChangeListeners(new StateChangedEvent(State.PAUSE));
+		} else {
+			fireStateChangeListeners(new StateChangedEvent(State.PLAY));
 		}
 		return true;
 	}

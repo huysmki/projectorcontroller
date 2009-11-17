@@ -16,6 +16,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -55,6 +56,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 	private JButton playButton;
 	private JButton pauseButton;
 	private JButton stopButton;
+	private JLabel statusLabel;
 
 	public static void main(String[] args) throws Exception {
 		ProjectorControllerServer server = new ProjectorControllerServer();
@@ -117,6 +119,8 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 		toolbar.add(playButton);
 		toolbar.add(pauseButton);
 		toolbar.add(stopButton);
+		statusLabel = new JLabel("");
+		toolbar.add(statusLabel);
 		return toolbar;
 	}
 
@@ -239,6 +243,11 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 			playButton.setEnabled(scenarioViewer.getSelectedObject() instanceof Scene);
 			pauseButton.setEnabled(false);
 			stopButton.setEnabled(false);
+			statusLabel.setText("");
+		} else if (e.getNewState().equals(State.PLAY)) {
+			statusLabel.setText("Playing");
+		} else if (e.getNewState().equals(State.PAUSE)) {
+			statusLabel.setText("Paused");
 		}
 	}
 }
