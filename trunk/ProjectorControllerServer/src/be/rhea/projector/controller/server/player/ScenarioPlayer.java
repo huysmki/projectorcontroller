@@ -1,10 +1,12 @@
 package be.rhea.projector.controller.server.player;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
 
+import be.rhea.projector.controller.server.player.StateChangedEvent.State;
 import be.rhea.projector.controller.server.scenario.Client;
 import be.rhea.projector.controller.server.scenario.Scenario;
 import be.rhea.projector.controller.server.scenario.Scene;
@@ -23,9 +25,10 @@ public class ScenarioPlayer implements Runnable {
 	private static int sceneIdToPlay;
 	private static boolean isPlaying = false;
 	private static boolean isPaused = false;
-	
 	private static Thread playerThread;
+	private static List<StateChangedListener> stateChangeListeners = new ArrayList<StateChangedListener>();
 	
+	//TODO implement Listener to track changing of events
 	private ScenarioPlayer() {
 	}
 
@@ -46,6 +49,7 @@ public class ScenarioPlayer implements Runnable {
 		isPlaying = true;
 		isPaused = false;
 		playerThread.start();
+		fireStateChangeListeners(new StateChangedEvent(State.PLAY));
 		return true;
 	}
 	
@@ -54,6 +58,11 @@ public class ScenarioPlayer implements Runnable {
 			return false;
 		}
 		isPaused = !isPaused;
+		if (isPaused) {
+			fireStateChangeListeners(new StateChangedEvent(State.PLAY));
+		} else {
+			fireStateChangeListeners(new StateChangedEvent(State.PAUSE));
+		}
 		return true;
 	}
 
@@ -63,6 +72,7 @@ public class ScenarioPlayer implements Runnable {
 		}
 		isPaused = false;
 		isPlaying = false;
+		fireStateChangeListeners(new StateChangedEvent(State.STOP));
 		return true;
 	}
 
@@ -133,5 +143,24 @@ public class ScenarioPlayer implements Runnable {
 		}
 		isPlaying = false;
 		isPaused = false;
+		fireStateChangeListeners(new StateChangedEvent(State.STOP));
+	}
+
+	public static boolean isPlaying() {
+		return isPlaying;
+	}
+
+	public static boolean isPaused() {
+		return isPaused;
+	}
+	
+	public static void addStateChangeListener(StateChangedListener listener) {
+		stateChangeListeners.add(listener);
+	}
+	
+	private static void fireStateChangeListeners(StateChangedEvent event) {
+		for (StateChangedListener listener : stateChangeListeners) {
+			listener.stateChanged(event);
+		}
 	}
 }
