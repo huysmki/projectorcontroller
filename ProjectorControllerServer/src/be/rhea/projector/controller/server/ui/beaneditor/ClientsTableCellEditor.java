@@ -41,6 +41,11 @@ public class ClientsTableCellEditor extends AbstractCellEditor implements
 
 	@Override
 	public Object getCellEditorValue() {
-		return ((Client)comboBox.getSelectedItem()).getId();
+		Client selectedClient = (Client)comboBox.getSelectedItem();
+		if (selectedClient == null) {
+			return 0;
+		} else {
+			return selectedClient.getId();
+		}
 	}
 }
