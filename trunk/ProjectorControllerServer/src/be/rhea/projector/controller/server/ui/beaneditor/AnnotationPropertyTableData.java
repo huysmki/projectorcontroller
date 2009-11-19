@@ -111,6 +111,7 @@ public class AnnotationPropertyTableData extends AbstractTableModel  {
 		
 	}
 
+	@SuppressWarnings("unchecked")
 	public String objToString(Object value) {
 		if (value == null)
 			return "Unknown";
@@ -129,6 +130,18 @@ public class AnnotationPropertyTableData extends AbstractTableModel  {
 			Color col = (Color) value;
 			return "" + col.getRed() + "," + col.getGreen() + ","
 					+ col.getBlue();
+		} else if (value instanceof ArrayList) {
+			ArrayList<Integer> arrayList = (ArrayList<Integer>) value;
+			StringBuilder builder = new StringBuilder();
+			boolean first = true;
+			for (Integer integer : arrayList) {
+				if (!first) {
+					builder.append(",");
+				}
+				builder.append(integer);
+				first = false;
+			}
+			return builder.toString();
 		}
 		return value.toString();
 	}
@@ -162,6 +175,14 @@ public class AnnotationPropertyTableData extends AbstractTableModel  {
 			} else if (name.equals("java.awt.Color")) {
 				int[] i = strToInts(str);
 				return new Color(i[0], i[1], i[2]);
+			} else if (name.equals("java.util.List")) {
+				int[] i = strToInts(str);
+				ArrayList<Integer> arrayList = new ArrayList<Integer>();
+				for (int j = 0; j < i.length; j++) {
+					int value = i[j];
+					arrayList.add(value);
+				}
+				return arrayList;
 			}
 			return null; // not supported
 		} catch (Exception ex) {
@@ -170,8 +191,9 @@ public class AnnotationPropertyTableData extends AbstractTableModel  {
 	}
 
 	public int[] strToInts(String str) throws Exception {
-		int[] i = new int[4];
 		StringTokenizer tokenizer = new StringTokenizer(str, ",");
+		int[] i = new int[tokenizer.countTokens()];
+		
 		for (int k = 0; k < i.length && tokenizer.hasMoreTokens(); k++)
 			i[k] = Integer.parseInt(tokenizer.nextToken());
 		return i;
