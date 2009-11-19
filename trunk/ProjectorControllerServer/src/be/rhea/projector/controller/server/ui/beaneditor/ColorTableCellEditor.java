@@ -49,7 +49,7 @@ public class ColorTableCellEditor extends AbstractCellEditor implements
 	}
 
 	private String colorToString() {
-		return color.getRed()+ "," + color.getGreen() + "," + color.getBlue();
+		return color == null?"":color.getRed()+ "," + color.getGreen() + "," + color.getBlue();
 	}
 
 	@Override

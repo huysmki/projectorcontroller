@@ -113,7 +113,7 @@ public class AnnotationPropertyTableData extends AbstractTableModel  {
 
 	public String objToString(Object value) {
 		if (value == null)
-			return "null";
+			return "Unknown";
 		if (value instanceof Dimension) {
 			Dimension dim = (Dimension) value;
 			return "" + dim.width + "," + dim.height;

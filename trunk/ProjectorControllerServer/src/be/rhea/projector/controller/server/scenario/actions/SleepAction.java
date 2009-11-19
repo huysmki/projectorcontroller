@@ -37,6 +37,6 @@ public class SleepAction extends AbstractAction {
 	
 	@Override
 	public String toString() {
-		return "Sleep " + time + " ms" + super.toString();
+		return "Sleep " + (time != 0?time + " ms":"") + super.toString();
 	}
 }

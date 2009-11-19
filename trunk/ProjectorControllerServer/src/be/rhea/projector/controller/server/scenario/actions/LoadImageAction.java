@@ -38,6 +38,6 @@ public class LoadImageAction extends AbstractClientAction {
 	
 	@Override
 	public String toString() {
-		return "Load Image " + fileName + super.toString(); 
+		return "Load Image " + (fileName != null?fileName:"") + super.toString(); 
 	}
 }
