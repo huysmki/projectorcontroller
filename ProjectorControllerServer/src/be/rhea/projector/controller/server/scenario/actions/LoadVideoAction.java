@@ -38,6 +38,6 @@ public class LoadVideoAction extends AbstractClientAction {
 	
 	@Override
 	public String toString() {
-		return "Load Video " + fileName + super.toString();
+		return "Load Video " + (fileName != null?fileName:"") + super.toString();
 	}
 }

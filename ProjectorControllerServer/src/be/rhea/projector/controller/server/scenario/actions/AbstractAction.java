@@ -27,6 +27,6 @@ public abstract class AbstractAction implements Serializable {
 	
 	@Override
 	public String toString() {
-		return " : " + name;
+		return name != null?(" : " + name):"";
 	}
 }

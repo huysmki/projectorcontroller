@@ -68,8 +68,8 @@ public class TransitionColorAction extends AbstractClientAction {
 	
 	@Override
 	public String toString() {
-		return "Transition from " + fromColor.getRed() + "," + fromColor.getGreen() + "," + fromColor.getBlue() +
+		return "Transition " + (fromColor != null && toColor != null?"from " + fromColor.getRed() + "," + fromColor.getGreen() + "," + fromColor.getBlue() +
 		       " to " + toColor.getRed() + "," + toColor.getGreen() + "," + toColor.getBlue() +
-		       " in " + time + " ms"  + super.toString();
+		       " in " + time + " ms":"")  + super.toString();
 	}
 }

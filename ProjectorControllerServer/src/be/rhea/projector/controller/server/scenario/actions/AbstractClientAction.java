@@ -37,6 +37,6 @@ public abstract class AbstractClientAction extends AbstractAction implements Ser
 	
 	@Override
 	public String toString() {
-		return " : " + (clientId > 0?" on client " + clientId:"");
+		return  (clientId > 0?": on client " + clientId:"");
 	}
 }

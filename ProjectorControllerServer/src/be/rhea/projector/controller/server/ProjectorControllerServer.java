@@ -50,6 +50,8 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 	private static final String PLAY_SCENE = "PLAY_SCENE";
 	private static final String PAUSE_SCENE = "PAUSE_SCENE";
 	private static final String STOP_SCENE = "STOP_SCENE";
+	private static final String NEW_SCENARIO = "NEW_SCENARIO";
+	private static final String EXIT = "EXIT";
 	private ScenarioViewer scenarioViewer;
 	private Scenario currentScenario;
 	private File selectedFile;
@@ -128,30 +130,41 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
 		JMenu playMenu = new JMenu("Play");
+		JMenuItem newScenario = new JMenuItem("New");
+		newScenario.setActionCommand(NEW_SCENARIO);
 		JMenuItem open = new JMenuItem("Open...");
 		open.setActionCommand(OPEN);
 		JMenuItem save = new JMenuItem("Save");
 		save.setActionCommand(SAVE);
 		JMenuItem saveAs = new JMenuItem("Save As...");
 		saveAs.setActionCommand(SAVE_AS);
-		JMenuItem playScene = new JMenuItem("Play Scene");
-		playScene.setActionCommand(PLAY_SCENE);
+		JMenuItem exit = new JMenuItem("Exit");
+		exit.setActionCommand(EXIT);
 		menuBar.add(fileMenu);
+		fileMenu.add(newScenario);
 		fileMenu.add(open);
+		fileMenu.addSeparator();
 		fileMenu.add(save);
 		fileMenu.add(saveAs);
-		playMenu.add(playScene);
+		fileMenu.addSeparator();
+		fileMenu.add(exit);
 		menuBar.add(playMenu);
 		this.setJMenuBar(menuBar);
+		newScenario.addActionListener(this);
 		open.addActionListener(this);
-		playScene.addActionListener(this);
 		save.addActionListener(this);
 		saveAs.addActionListener(this);
+		exit.addActionListener(this);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent actionEvent) {
-		if (OPEN.equals(actionEvent.getActionCommand())) {
+		if (NEW_SCENARIO.equals(actionEvent.getActionCommand())) {
+			scenarioViewer.setScenario(new Scenario());
+			this.setTitle(TITLE + " " + "NewScenario");
+		} else if (EXIT.equals(actionEvent.getActionCommand())) {
+			System.exit(0);
+		} else if (OPEN.equals(actionEvent.getActionCommand())) {
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.setFileFilter(new XMLFileFilter());
 			fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);

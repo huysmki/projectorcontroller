@@ -42,6 +42,6 @@ public class ColorAction extends AbstractClientAction {
 	
 	@Override
 	public String toString() {
-		return "Color " + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + super.toString();
+		return "Color " + (color != null?(color.getRed() + "," + color.getGreen() + "," + color.getBlue()):"") + super.toString();
 	}
 }
