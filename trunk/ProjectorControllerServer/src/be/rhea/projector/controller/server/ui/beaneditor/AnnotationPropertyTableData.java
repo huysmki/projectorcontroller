@@ -6,6 +6,7 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.swing.table.AbstractTableModel;
@@ -214,17 +215,21 @@ public class AnnotationPropertyTableData extends AbstractTableModel  {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	public TableCellEditor getCellEditor(int row, int column) {
 		if (column == 1) {
 			PropertyData propertyData = editableProperties.get(row);
+			String valueAt = (String) getValueAt(row, column);
 			if (propertyData.getType() == Type.COLOR) {
-				return (TableCellEditor) new ColorTableCellEditor((Color) stringToObj((String) getValueAt(row, column), Color.class));
+				return (TableCellEditor) new ColorTableCellEditor((Color) stringToObj(valueAt, Color.class));
 			} else if (propertyData.getType() == Type.FILE) {
-				return (TableCellEditor) new FileTableCellEditor((String) getValueAt(row, column));
+				return (TableCellEditor) new FileTableCellEditor(valueAt);
 			} else if (propertyData.getType() == Type.CLIENTS) {
-				return (TableCellEditor) new ClientsTableCellEditor(Integer.parseInt((String) getValueAt(row, column)), clients);
+				return (TableCellEditor) new ClientsTableCellEditor(Integer.parseInt(valueAt), clients);
 			} else if (propertyData.getType() == Type.IP) {
-				return (TableCellEditor) new IPTableCellEditor((String) getValueAt(row, column));
+				return (TableCellEditor) new IPTableCellEditor(valueAt);
+			} else if (propertyData.getType() == Type.ARTNET) {
+				return (TableCellEditor) new ArtNetTableCellEditor(((ArrayList<Integer>) stringToObj(valueAt, List.class)));
 			}
 		}
 		return null;

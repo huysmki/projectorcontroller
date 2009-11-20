@@ -39,15 +39,6 @@ public class SimpleProtocolUDPClient extends SimpleProtocolClient {
 		InetAddress a = InetAddress.getByName(host);
 	    byte[] inetaddress = a.getAddress();
 	    
-//		byte[] inetaddress = new byte[4];
-//		inetaddress[0] = (byte) 0xFF;
-//		inetaddress[1] = (byte) 0xFF;
-//		inetaddress[2] = (byte) 0xFF;
-//		inetaddress[3] = (byte) 0xFF;
-//		inetaddress[0] = (byte) 10;
-//		inetaddress[1] = (byte) 0;
-//		inetaddress[2] = (byte) 2;
-//		inetaddress[3] = (byte) 240;
 		DatagramPacket packet = new DatagramPacket(data.getBytes(), data.length(), InetAddress.getByAddress(inetaddress), port);
 		datagramSocket.send(packet);
 		System.out.println("Sending " + data + " to " + InetAddress.getByAddress(inetaddress).getHostAddress() + ":" + port);
