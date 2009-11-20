@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EditableProperty {
-	public enum Type { TEXT, COLOR, FILE, CLIENTS, IP }
+	public enum Type { TEXT, COLOR, FILE, CLIENTS, IP, ARTNET }
 	String name();
 	Type type() default Type.TEXT;
 }

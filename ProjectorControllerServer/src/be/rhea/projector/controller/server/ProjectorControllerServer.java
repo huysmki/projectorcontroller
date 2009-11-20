@@ -39,8 +39,6 @@ import be.rhea.projector.controller.server.scenario.Scene;
 import be.rhea.projector.controller.server.ui.ScenarioViewer;
 import be.rhea.projector.controller.server.ui.beaneditor.BeanEditor;
 
-// http://www.eclipse.org/swt/snippets/
-// http://www.cs.umanitoba.ca/~eclipse/2-Basic.pdf
 public class ProjectorControllerServer extends JFrame implements ActionListener, TreeSelectionListener, StateChangedListener {
 	private static final String TITLE = "Projector Controller";
 	private static final long serialVersionUID = 1L;
@@ -129,7 +127,6 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 	private void createMenu() {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
-		JMenu playMenu = new JMenu("Play");
 		JMenuItem newScenario = new JMenuItem("New");
 		newScenario.setActionCommand(NEW_SCENARIO);
 		JMenuItem open = new JMenuItem("Open...");
@@ -148,7 +145,6 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 		fileMenu.add(saveAs);
 		fileMenu.addSeparator();
 		fileMenu.add(exit);
-		menuBar.add(playMenu);
 		this.setJMenuBar(menuBar);
 		newScenario.addActionListener(this);
 		open.addActionListener(this);

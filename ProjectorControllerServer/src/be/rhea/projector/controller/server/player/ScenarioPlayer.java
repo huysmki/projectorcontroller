@@ -13,9 +13,11 @@ import be.rhea.projector.controller.server.scenario.Scene;
 import be.rhea.projector.controller.server.scenario.ScenePart;
 import be.rhea.projector.controller.server.scenario.actions.AbstractAction;
 import be.rhea.projector.controller.server.scenario.actions.AbstractClientAction;
+import be.rhea.projector.controller.server.scenario.actions.ArtNetAction;
 import be.rhea.projector.controller.server.scenario.actions.ManualAcknownledgeAction;
 import be.rhea.projector.controller.server.scenario.actions.SleepAction;
 import be.rhea.remote.PCP;
+import be.rhea.remote.client.ArtNetProtocolUDPClient;
 import be.rhea.remote.client.SimpleProtocolClient;
 import be.rhea.remote.client.SimpleProtocolUDPClient;
 
@@ -85,7 +87,7 @@ public class ScenarioPlayer implements Runnable {
 		return null;
 	}
 
-	private void sendCommand(Client client, String command, String[] parameters) {
+	private void sendSimpleProtocolCommand(Client client, String command, String[] parameters) {
 		
 		try {
 			System.out.println("Send command " + command + " to " + client.getHost() + ":" + client.getPort());
@@ -98,8 +100,18 @@ public class ScenarioPlayer implements Runnable {
 			//TODO log
 			e.printStackTrace();
 		}
-		
 	}
+	
+	private void sendArtNetCommand(Client client, List<Integer> data) {
+		try {
+			System.out.println("Send ArtNet package to " + client.getHost() + ":" + client.getPort());
+			ArtNetProtocolUDPClient socketClient = new ArtNetProtocolUDPClient(client.getHost(), client.getPort());
+			socketClient.sendData(data);
+		} catch (IOException e) {
+			//TODO log
+			e.printStackTrace();
+		}
+	}	
 
 	@Override
 	public void run() {
@@ -133,11 +145,15 @@ public class ScenarioPlayer implements Runnable {
 					
 				} else if (action instanceof ManualAcknownledgeAction) {
 					JOptionPane.showMessageDialog(null, "Please Aknowledge");
+				} else if (action instanceof ArtNetAction) {
+					int clientId = ((AbstractClientAction) action).getClientId();
+					Client client = getClientForId(clients, clientId);
+					sendArtNetCommand(client, ((ArtNetAction)action).getValues());
 				}
 				 else if (action instanceof AbstractClientAction){
 					int clientId = ((AbstractClientAction) action).getClientId();
 					Client client = getClientForId(clients, clientId);
-					sendCommand(client, command, action.getParameters());
+					sendSimpleProtocolCommand(client, command, action.getParameters());
 				}
 			}
 		}
