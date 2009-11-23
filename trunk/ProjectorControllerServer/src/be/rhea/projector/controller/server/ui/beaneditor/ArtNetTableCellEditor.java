@@ -152,7 +152,6 @@ public class ArtNetTableCellEditor extends AbstractCellEditor implements
 	class SliderAndTextComponent extends JPanel implements ChangeListener {
 		private static final long serialVersionUID = 1L;
 		private int value;
-		private final int index;
 		private JTextField valueField;
 		private JSlider slider;
 		
@@ -161,7 +160,6 @@ public class ArtNetTableCellEditor extends AbstractCellEditor implements
 		}
 
 		public SliderAndTextComponent(int index, int value) {
-			this.index = index;
 			this.value = value;
 			JLabel label = new JLabel();
 			label.setText(String.valueOf(index + 1));
