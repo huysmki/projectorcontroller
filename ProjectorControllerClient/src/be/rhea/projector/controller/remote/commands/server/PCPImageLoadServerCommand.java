@@ -31,7 +31,6 @@ public class PCPImageLoadServerCommand implements
 		Thread t = new Thread(this);
 		t.start();
 		
-		
 		return "Image Loaded";
 	}
 
@@ -40,7 +39,6 @@ public class PCPImageLoadServerCommand implements
 		try {
 			File file = new File(mediaDir, imageName);
 			BufferedImage image = ImageIO.read(file);
-			System.out.println("load image " + file.getAbsolutePath() + " image " + image.getHeight());
 			mediaPanel.setImage(image);
 		} catch (IOException e) {
 			e.printStackTrace();

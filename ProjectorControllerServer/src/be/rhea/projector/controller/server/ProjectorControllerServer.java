@@ -51,7 +51,6 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 	private static final String NEW_SCENARIO = "NEW_SCENARIO";
 	private static final String EXIT = "EXIT";
 	private ScenarioViewer scenarioViewer;
-	private Scenario currentScenario;
 	private File selectedFile;
 	private JButton playButton;
 	private JButton pauseButton;
@@ -155,6 +154,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 
 	@Override
 	public void actionPerformed(ActionEvent actionEvent) {
+		Scenario currentScenario = scenarioViewer.getScenario();
 		if (NEW_SCENARIO.equals(actionEvent.getActionCommand())) {
 			scenarioViewer.setScenario(new Scenario());
 			this.setTitle(TITLE + " " + "NewScenario");
