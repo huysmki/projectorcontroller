@@ -5,7 +5,7 @@ import be.rhea.projector.controller.server.annotation.EditableProperty;
 public class SleepAction extends AbstractAction {
 	private static final long serialVersionUID = 4463488314619618843L;
 	public static final String SLEEP = "SLEEP";
-	@EditableProperty(name = "Time")
+	@EditableProperty(name = "Time (ms)")
 	int time;
 	
 	public SleepAction() {

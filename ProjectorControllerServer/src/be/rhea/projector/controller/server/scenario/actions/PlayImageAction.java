@@ -1,9 +1,13 @@
 package be.rhea.projector.controller.server.scenario.actions;
 
+import be.rhea.projector.controller.server.annotation.EditableProperty;
 import be.rhea.remote.PCP;
 
 public class PlayImageAction extends AbstractClientAction {
 	private static final long serialVersionUID = -210805641078411328L;
+	
+	@EditableProperty(name="FadeIn Time (ms)")
+	private int fadeInTime = 0;
 
 	public PlayImageAction() {
 		super(null,0);
@@ -19,7 +23,14 @@ public class PlayImageAction extends AbstractClientAction {
 
 	@Override
 	public String[] getParameters() {
-		return null;
+		return new String[]{String.valueOf(fadeInTime)};
+	}
+	
+	public void setFadeInTime(int fadeInTime) {
+		this.fadeInTime = fadeInTime;
+	}
+	public int getFadeInTime() {
+		return fadeInTime;
 	}
 	
 	@Override

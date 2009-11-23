@@ -3,13 +3,13 @@ package be.rhea.projector.controller.client.ui;
 // Fig 21.6: MediaPanel.java
 // A JPanel the plays media from a URL
 import java.awt.BorderLayout;
-import java.awt.Graphics;
 
 import javax.media.Manager;
 import javax.media.bean.playerbean.MediaPlayer;
 import javax.swing.JPanel;
 
 public class VideoMediaPanel extends JPanel {
+	private static final long serialVersionUID = 3632647220675028768L;
 	private MediaPlayer mediaPlayer;
 
 	public VideoMediaPanel() {
