@@ -16,6 +16,7 @@ import be.rhea.projector.controller.client.ui.ColorPanel;
 import be.rhea.projector.controller.client.ui.ImagePanel;
 import be.rhea.projector.controller.client.ui.VideoMediaPanel;
 import be.rhea.projector.controller.remote.commands.server.PCPColorServerCommand;
+import be.rhea.projector.controller.remote.commands.server.PCPImageFadeOutServerCommand;
 import be.rhea.projector.controller.remote.commands.server.PCPImageLoadServerCommand;
 import be.rhea.projector.controller.remote.commands.server.PCPImagePlayServerCommand;
 import be.rhea.projector.controller.remote.commands.server.PCPMediaTarFileTransferServerCommand;
@@ -69,6 +70,9 @@ public class ProjectorControllerClient {
 
 		PCPImagePlayServerCommand imagePlayServerCommand = new PCPImagePlayServerCommand(frame, imagePanel);
 		commandMap.put(PCP.PROTOCOL + ":" + PCP.START_IMAGE, imagePlayServerCommand);
+
+		PCPImageFadeOutServerCommand imageFadeOutServerCommand = new PCPImageFadeOutServerCommand(frame, imagePanel);
+		commandMap.put(PCP.PROTOCOL + ":" + PCP.FADE_OUT_IMAGE, imageFadeOutServerCommand);
 
 		PCPVideoMediaStartServerCommand videoMediaStartServerCommand = new PCPVideoMediaStartServerCommand(frame, mediaPanel);
 		commandMap.put(PCP.PROTOCOL + ":" + PCP.START_VIDEO_MEDIA, videoMediaStartServerCommand);

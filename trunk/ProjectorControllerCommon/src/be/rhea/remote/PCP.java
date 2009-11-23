@@ -18,4 +18,6 @@ public class PCP {
 	public static final String LOAD_IMAGE = "LOAD_IMAGE";
 
 	public static final String START_IMAGE = "START_IMAGE";
+	
+	public static final String FADE_OUT_IMAGE = "FADE_OUT_IMAGE";
 }
