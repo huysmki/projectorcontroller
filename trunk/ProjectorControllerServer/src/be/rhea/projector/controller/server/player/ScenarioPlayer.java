@@ -144,7 +144,8 @@ public class ScenarioPlayer implements Runnable {
 					}
 					
 				} else if (action instanceof ManualAcknownledgeAction) {
-					JOptionPane.showMessageDialog(null, "Please Aknowledge");
+					ManualAcknownledgeAction manualAcknowledgeAction = (ManualAcknownledgeAction) action; 
+					JOptionPane.showMessageDialog(null, manualAcknowledgeAction.getMessage()!= null?manualAcknowledgeAction.getMessage():"Please Aknowledge");
 				} else if (action instanceof ArtNetAction) {
 					int clientId = ((AbstractClientAction) action).getClientId();
 					Client client = getClientForId(clients, clientId);
