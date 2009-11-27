@@ -294,6 +294,7 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 			if (model != null) {
 				model.nodeStructureChanged(clientsItem);
 			}
+			setTreeNodeAsSelected(newClientNode);
 		} else if (ADD_ACTION.equals(event.getActionCommand())) {
 			
 			Object[] actions = new Object[]{new SleepAction(), 
@@ -326,8 +327,10 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 						model.nodeStructureChanged(parent);
 					}					
 				}
+				setTreeNodeAsSelected(newActionNode);
 			}
 		} else if (MOVE_DOWN.equals(event.getActionCommand())) {
+			DefaultMutableTreeNode backupTreeNode = selectedTreeNode;
 			DefaultMutableTreeNode parent = (DefaultMutableTreeNode) selectedTreeNode.getParent();
 			int index = parent.getIndex(selectedTreeNode);
 			parent.remove(index);
@@ -335,8 +338,11 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 			DefaultTreeModel model = (DefaultTreeModel) this.getModel();
 			if (model != null) {
 				model.nodeStructureChanged(parent);
-			}					
+			}		
+			setTreeNodeAsSelected(backupTreeNode);
+			
 		} else if (MOVE_UP.equals(event.getActionCommand())) {
+			DefaultMutableTreeNode backupTreeNode = selectedTreeNode;
 			DefaultMutableTreeNode parent = (DefaultMutableTreeNode) selectedTreeNode.getParent();
 			int index = parent.getIndex(selectedTreeNode);
 			parent.remove(index);
@@ -345,6 +351,7 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 			if (model != null) {
 				model.nodeStructureChanged(parent);
 			}					
+			setTreeNodeAsSelected(backupTreeNode);
 
 		} else if (REMOVE.equals(event.getActionCommand())) {
 			if (JOptionPane.showConfirmDialog(null, "Are you sure?", "Delete", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
@@ -368,6 +375,7 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 					model.nodeStructureChanged(parent);
 				}					
 			}
+			setTreeNodeAsSelected(newSceneNode);
 		} else if (ADD_SCENEPART.equals(event.getActionCommand())) {
 			DefaultMutableTreeNode newScenePartNode = new DefaultMutableTreeNode(new ScenePart());
 			if (selectedObject instanceof Scene) {
@@ -385,7 +393,14 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 					model.nodeStructureChanged(parent);
 				}					
 			}
+			setTreeNodeAsSelected(newScenePartNode);
 		}
+	}
+
+	private void setTreeNodeAsSelected(DefaultMutableTreeNode newClientNode) {
+		TreePath treePath = new TreePath(newClientNode.getPath());
+		this.setSelectionPath(treePath);
+		this.scrollPathToVisible(treePath);
 	}
 
 	@Override
