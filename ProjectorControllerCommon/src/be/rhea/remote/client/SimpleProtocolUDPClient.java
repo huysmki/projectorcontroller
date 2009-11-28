@@ -41,7 +41,7 @@ public class SimpleProtocolUDPClient extends SimpleProtocolClient {
 	    
 		DatagramPacket packet = new DatagramPacket(data.getBytes(), data.length(), InetAddress.getByAddress(inetaddress), port);
 		datagramSocket.send(packet);
-		System.out.println("Sending " + data + " to " + InetAddress.getByAddress(inetaddress).getHostAddress() + ":" + port);
+		//System.out.println("Sending " + data + " to " + InetAddress.getByAddress(inetaddress).getHostAddress() + ":" + port);
 	}
 
 	@Override

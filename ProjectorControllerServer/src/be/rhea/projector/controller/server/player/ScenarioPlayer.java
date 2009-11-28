@@ -90,7 +90,7 @@ public class ScenarioPlayer implements Runnable {
 	private void sendSimpleProtocolCommand(Client client, String command, String[] parameters) {
 		
 		try {
-			System.out.println("Send command " + command + " to " + client.getHost() + ":" + client.getPort());
+//			//System.out.println("Send command " + command + " to " + client.getHost() + ":" + client.getPort());
 //			SimpleProtocolTCPClient socketClient = new SimpleProtocolTCPClient(client.getHost(), client.getPort(), PCP.PROTOCOL);
 			SimpleProtocolClient socketClient = new SimpleProtocolUDPClient(client.getHost(), client.getPort(), PCP.PROTOCOL);
 			socketClient.connect();
@@ -104,7 +104,7 @@ public class ScenarioPlayer implements Runnable {
 	
 	private void sendArtNetCommand(Client client, List<Integer> data) {
 		try {
-			System.out.println("Send ArtNet package to " + client.getHost() + ":" + client.getPort());
+			//System.out.println("Send ArtNet package to " + client.getHost() + ":" + client.getPort());
 			ArtNetProtocolUDPClient socketClient = new ArtNetProtocolUDPClient(client.getHost(), client.getPort());
 			socketClient.sendData(data);
 		} catch (IOException e) {

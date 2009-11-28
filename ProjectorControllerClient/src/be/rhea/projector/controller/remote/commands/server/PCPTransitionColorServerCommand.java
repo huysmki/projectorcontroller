@@ -56,16 +56,16 @@ public class PCPTransitionColorServerCommand implements
 		float deltaR = ((float)(toR - fromR)) / 255;
 		float deltaG = ((float)(toG - fromG)) / 255;
 		float deltaB = ((float)(toB - fromB)) / 255;
-//		System.out.println("toR=" + toR +",toG=" + toG +",toB=" + toB);
-//		System.out.println("fromR=" + fromR +",fromG=" + fromG +",fromB=" + fromB);
-//		System.out.println("deltaR=" + deltaR +",deltaG=" + deltaG +",deltaB=" + deltaB);
+//		//System.out.println("toR=" + toR +",toG=" + toG +",toB=" + toB);
+//		//System.out.println("fromR=" + fromR +",fromG=" + fromG +",fromB=" + fromB);
+//		//System.out.println("deltaR=" + deltaR +",deltaG=" + deltaG +",deltaB=" + deltaB);
 		for (int i = 0; i < 255; i++) {
 			try {
 				Thread.sleep(sleeptime);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-//			System.out.println("i = " + i + " R=" + (int)(fromR + (deltaR * i)) + ",G=" + (int)(fromG + (deltaG * i)) + ",B=" + (int)(fromB + (deltaB * i)));
+//			//System.out.println("i = " + i + " R=" + (int)(fromR + (deltaR * i)) + ",G=" + (int)(fromG + (deltaG * i)) + ",B=" + (int)(fromB + (deltaB * i)));
 			int red = (int)(fromR + (deltaR * i));
 			if (red < 0) {
 				red = 0;

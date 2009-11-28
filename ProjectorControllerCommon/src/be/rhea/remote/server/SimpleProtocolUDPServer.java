@@ -41,11 +41,11 @@ public class SimpleProtocolUDPServer extends SimpleProtocolServer implements Run
 	public void run() {
 		try {
 			while (running) {
-				System.out.println("Waiting for message");
+				//System.out.println("Waiting for message");
 				byte[] buffer = new byte[1024];
 				DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 				datagramSocket.receive(packet);
-				System.out.println("Message received");
+				//System.out.println("Message received");
 				Thread sockethandletThread = new Thread(new SocketHandler(
 						packet));
 				sockethandletThread.start();
@@ -73,9 +73,9 @@ public class SimpleProtocolUDPServer extends SimpleProtocolServer implements Run
 		public void run() {
 			try {
 				String line = new String(packet.getData(), 0, packet.getLength());
-				System.out.println("Data = " + line);
+				//System.out.println("Data = " + line);
 				String[] lineParts = line.split(" ");
-				System.out.println("CommandName = " + lineParts[0]);
+				//System.out.println("CommandName = " + lineParts[0]);
 				SimpleProtocolServerCommand command = (SimpleProtocolServerCommand) commandMap
 						.get(lineParts[0]);
 				String[] parameters = null;
@@ -84,7 +84,7 @@ public class SimpleProtocolUDPServer extends SimpleProtocolServer implements Run
 					System.arraycopy(lineParts, 1, parameters, 0, lineParts.length - 1);
 				}
 				 
-				System.out.println("Command = " + command);
+				//System.out.println("Command = " + command);
 				if (command != null) {
 					if (command instanceof SimpleProtocolServerExecuteCommand) {
 						((SimpleProtocolServerExecuteCommand) command).execute(parameters);

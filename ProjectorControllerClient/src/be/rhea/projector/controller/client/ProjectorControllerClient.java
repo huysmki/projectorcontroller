@@ -21,7 +21,6 @@ import be.rhea.projector.controller.remote.commands.server.PCPImageLoadServerCom
 import be.rhea.projector.controller.remote.commands.server.PCPImagePlayServerCommand;
 import be.rhea.projector.controller.remote.commands.server.PCPMediaTarFileTransferServerCommand;
 import be.rhea.projector.controller.remote.commands.server.PCPTransitionColorServerCommand;
-import be.rhea.projector.controller.remote.commands.server.PCPVideoMediaLoadServerCommand;
 import be.rhea.projector.controller.remote.commands.server.PCPVideoMediaStartServerCommand;
 import be.rhea.projector.controller.remote.commands.server.PCPVideoMediaStopServerCommand;
 import be.rhea.remote.PCP;
@@ -54,9 +53,9 @@ public class ProjectorControllerClient {
 		mediaTarFileTransferServerCommand.setMediaDir("c:/temp/" + port);
 		commandMap.put(PCP.PROTOCOL + ":" + PCP.UPLOAD_MEDIA, mediaTarFileTransferServerCommand);
 		
-		PCPVideoMediaLoadServerCommand videoMediaLoadServerCommand = new PCPVideoMediaLoadServerCommand(mediaPanel);
-		videoMediaLoadServerCommand.setMediaDir("c:/temp/" + port);
-		commandMap.put(PCP.PROTOCOL + ":" + PCP.LOAD_VIDEO_MEDIA, videoMediaLoadServerCommand);
+		PCPVideoMediaStartServerCommand videoMediaStartServerCommand = new PCPVideoMediaStartServerCommand(frame, mediaPanel);
+		videoMediaStartServerCommand.setMediaDir("c:/temp/" + port);
+		commandMap.put(PCP.PROTOCOL + ":" + PCP.START_VIDEO_MEDIA, videoMediaStartServerCommand);
 		
 		PCPColorServerCommand colorLoadServerCommand = new PCPColorServerCommand(frame, colorPanel);
 		commandMap.put(PCP.PROTOCOL + ":" + PCP.START_COLOR, colorLoadServerCommand);
@@ -73,9 +72,6 @@ public class ProjectorControllerClient {
 
 		PCPImageFadeOutServerCommand imageFadeOutServerCommand = new PCPImageFadeOutServerCommand(frame, imagePanel);
 		commandMap.put(PCP.PROTOCOL + ":" + PCP.FADE_OUT_IMAGE, imageFadeOutServerCommand);
-
-		PCPVideoMediaStartServerCommand videoMediaStartServerCommand = new PCPVideoMediaStartServerCommand(frame, mediaPanel);
-		commandMap.put(PCP.PROTOCOL + ":" + PCP.START_VIDEO_MEDIA, videoMediaStartServerCommand);
 
 		PCPVideoMediaStopServerCommand videoMediaStopServerCommand = new PCPVideoMediaStopServerCommand(mediaPanel);
 		commandMap.put(PCP.PROTOCOL + ":" + PCP.STOP_VIDEO_MEDIA, videoMediaStopServerCommand);

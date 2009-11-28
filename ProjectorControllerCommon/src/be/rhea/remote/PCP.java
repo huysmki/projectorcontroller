@@ -5,8 +5,6 @@ public class PCP {
 
 	public static final String UPLOAD_MEDIA = "UPLOADMEDIA";
 
-	public static final String LOAD_VIDEO_MEDIA = "LOADVIDEOMEDIA";
-
 	public static final String START_VIDEO_MEDIA = "STARTVIDEOMEDIA";
 
 	public static final String STOP_VIDEO_MEDIA = "STOPVIDEOMEDIA";
