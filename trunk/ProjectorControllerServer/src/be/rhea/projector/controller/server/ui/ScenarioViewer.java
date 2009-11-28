@@ -30,10 +30,9 @@ import be.rhea.projector.controller.server.scenario.actions.ArtNetAction;
 import be.rhea.projector.controller.server.scenario.actions.ColorAction;
 import be.rhea.projector.controller.server.scenario.actions.FadeOutImageAction;
 import be.rhea.projector.controller.server.scenario.actions.LoadImageAction;
-import be.rhea.projector.controller.server.scenario.actions.LoadVideoAction;
+import be.rhea.projector.controller.server.scenario.actions.StartVideoAction;
 import be.rhea.projector.controller.server.scenario.actions.ManualAcknownledgeAction;
 import be.rhea.projector.controller.server.scenario.actions.PlayImageAction;
-import be.rhea.projector.controller.server.scenario.actions.PlayVideoAction;
 import be.rhea.projector.controller.server.scenario.actions.SleepAction;
 import be.rhea.projector.controller.server.scenario.actions.StopVideoAction;
 import be.rhea.projector.controller.server.scenario.actions.TransitionColorAction;
@@ -304,8 +303,7 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 					                        new LoadImageAction(),
 					                        new PlayImageAction(),
 					                        new FadeOutImageAction(),
-					                        new LoadVideoAction(),
-					                        new PlayVideoAction(),
+					                        new StartVideoAction(),
 					                        new StopVideoAction(),
 					                        new ArtNetAction()};
 			Object selectedAction = JOptionPane.showInputDialog(null, "Select Action to add", "Select action", JOptionPane.QUESTION_MESSAGE, null, actions, null);
