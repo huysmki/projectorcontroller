@@ -18,8 +18,10 @@ import be.rhea.projector.controller.server.scenario.actions.ManualAcknownledgeAc
 import be.rhea.projector.controller.server.scenario.actions.SleepAction;
 import be.rhea.remote.PCP;
 import be.rhea.remote.client.ArtNetProtocolUDPClient;
+import be.rhea.remote.client.ArtNetProtocolUDPWithRetryClient;
 import be.rhea.remote.client.SimpleProtocolClient;
 import be.rhea.remote.client.SimpleProtocolUDPClient;
+import be.rhea.remote.client.SimpleProtocolUDPWithRetryClient;
 
 public class ScenarioPlayer implements Runnable {
 
@@ -92,7 +94,8 @@ public class ScenarioPlayer implements Runnable {
 		try {
 //			//System.out.println("Send command " + command + " to " + client.getHost() + ":" + client.getPort());
 //			SimpleProtocolTCPClient socketClient = new SimpleProtocolTCPClient(client.getHost(), client.getPort(), PCP.PROTOCOL);
-			SimpleProtocolClient socketClient = new SimpleProtocolUDPClient(client.getHost(), client.getPort(), PCP.PROTOCOL);
+//			SimpleProtocolClient socketClient = new SimpleProtocolUDPClient(client.getHost(), client.getPort(), PCP.PROTOCOL);
+			SimpleProtocolClient socketClient = new SimpleProtocolUDPWithRetryClient(client.getHost(), client.getPort(), PCP.PROTOCOL);
 			socketClient.connect();
 			socketClient.sendCommand(command, parameters);
 			socketClient.disconnect();
@@ -105,7 +108,7 @@ public class ScenarioPlayer implements Runnable {
 	private void sendArtNetCommand(Client client, List<Integer> data) {
 		try {
 			//System.out.println("Send ArtNet package to " + client.getHost() + ":" + client.getPort());
-			ArtNetProtocolUDPClient socketClient = new ArtNetProtocolUDPClient(client.getHost(), client.getPort());
+			ArtNetProtocolUDPWithRetryClient socketClient = new ArtNetProtocolUDPWithRetryClient(client.getHost(), client.getPort());
 			socketClient.sendData(data);
 		} catch (IOException e) {
 			//TODO log

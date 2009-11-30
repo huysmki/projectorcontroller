@@ -27,6 +27,7 @@ import be.rhea.remote.PCP;
 import be.rhea.remote.server.SimpleProtocolServer;
 import be.rhea.remote.server.SimpleProtocolServerCommand;
 import be.rhea.remote.server.SimpleProtocolUDPServer;
+import be.rhea.remote.server.SimpleProtocolUDPWithRetryServer;
 
 public class ProjectorControllerClient {
 	public static void main(String args[]) throws IOException {
@@ -77,7 +78,8 @@ public class ProjectorControllerClient {
 		commandMap.put(PCP.PROTOCOL + ":" + PCP.STOP_VIDEO_MEDIA, videoMediaStopServerCommand);
 
 //		SimpleProtocolServer server = new SimpleProtocolTCPServer(port, PCP.PROTOCOL);
-		SimpleProtocolServer server = new SimpleProtocolUDPServer(port, PCP.PROTOCOL);
+//		SimpleProtocolServer server = new SimpleProtocolUDPServer(port, PCP.PROTOCOL);
+		SimpleProtocolServer server = new SimpleProtocolUDPWithRetryServer(port, PCP.PROTOCOL);
 		server.setCommandMap(commandMap);
         Logger logger = Logger.getLogger("be.rhea.remote.server.SimpleProtocolServer");
         logger.setLevel(Level.ALL);
