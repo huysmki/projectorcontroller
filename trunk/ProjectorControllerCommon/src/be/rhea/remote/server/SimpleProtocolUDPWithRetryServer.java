@@ -14,11 +14,9 @@ public class SimpleProtocolUDPWithRetryServer extends SimpleProtocolServer imple
 	private Thread serverThread;
 	private boolean running = true;
 	private DatagramSocket datagramSocket;
-	private final String protocol;
 
 	public SimpleProtocolUDPWithRetryServer(int port, String protocol) {
 		this.port = port;
-		this.protocol = protocol;
 	}
 
 	public void start() throws IOException {
@@ -73,9 +71,7 @@ public class SimpleProtocolUDPWithRetryServer extends SimpleProtocolServer imple
 		public void run() {
 			try {
 				String line = new String(packet.getData(), 0, packet.getLength());
-				//System.out.println("Data = " + line);
 				String[] lineParts = line.split(" ");
-				//System.out.println("CommandName = " + lineParts[0]);
 				SimpleProtocolServerCommand command = (SimpleProtocolServerCommand) commandMap
 						.get(lineParts[0]);
 				String[] parameters = null;
@@ -84,7 +80,6 @@ public class SimpleProtocolUDPWithRetryServer extends SimpleProtocolServer imple
 					System.arraycopy(lineParts, 1, parameters, 0, lineParts.length - 1);
 				}
 				 
-				//System.out.println("Command = " + command);
 				if (command != null) {
 					if (command instanceof SimpleProtocolServerExecuteCommand) {
 						((SimpleProtocolServerExecuteCommand) command).execute(parameters);

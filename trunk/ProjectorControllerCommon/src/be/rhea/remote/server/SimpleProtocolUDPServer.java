@@ -17,11 +17,8 @@ public class SimpleProtocolUDPServer extends SimpleProtocolServer implements Run
 
 	DatagramSocket datagramSocket;
 
-	private final String protocol;
-
 	public SimpleProtocolUDPServer(int port, String protocol) {
 		this.port = port;
-		this.protocol = protocol;
 	}
 
 	public void start() throws IOException {
@@ -41,11 +38,9 @@ public class SimpleProtocolUDPServer extends SimpleProtocolServer implements Run
 	public void run() {
 		try {
 			while (running) {
-				//System.out.println("Waiting for message");
 				byte[] buffer = new byte[1024];
 				DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 				datagramSocket.receive(packet);
-				//System.out.println("Message received");
 				Thread sockethandletThread = new Thread(new SocketHandler(
 						packet));
 				sockethandletThread.start();
@@ -73,9 +68,7 @@ public class SimpleProtocolUDPServer extends SimpleProtocolServer implements Run
 		public void run() {
 			try {
 				String line = new String(packet.getData(), 0, packet.getLength());
-				//System.out.println("Data = " + line);
 				String[] lineParts = line.split(" ");
-				//System.out.println("CommandName = " + lineParts[0]);
 				SimpleProtocolServerCommand command = (SimpleProtocolServerCommand) commandMap
 						.get(lineParts[0]);
 				String[] parameters = null;
