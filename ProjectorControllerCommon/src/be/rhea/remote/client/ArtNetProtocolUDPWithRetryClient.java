@@ -33,7 +33,6 @@ public class ArtNetProtocolUDPWithRetryClient {
 			this.data = data;
 		}
 
-		@Override
 		public void run() {
 			try {
 				DatagramSocket datagramSocket = new DatagramSocket();
