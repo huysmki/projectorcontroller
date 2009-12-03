@@ -14,7 +14,6 @@ public class PCPImageFadeOutServerCommand implements
 		this.mediaPanel = imagePanel;
 	}
 
-	@Override
 	public String execute(String[] parameters) {
 		int fadeOutTime = Integer.valueOf(parameters[0]);
 		mediaPanel.fadeOut(fadeOutTime);

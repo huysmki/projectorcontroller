@@ -18,7 +18,6 @@ public class PCPColorServerCommand implements
 		this.mediaPanel = colorPanel;
 	}
 
-	@Override
 	public String execute(String[] parameters) {
 		frame.getContentPane().removeAll();
 		frame.getContentPane().add(mediaPanel);
