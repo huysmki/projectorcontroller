@@ -57,6 +57,6 @@ public class Scenario implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "Scenario " + name;
+		return "Scenario " + (name == null?"":name);
 	}
 }

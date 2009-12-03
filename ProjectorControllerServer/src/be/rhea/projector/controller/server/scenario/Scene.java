@@ -42,7 +42,7 @@ public class Scene implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "Scene " + name;
+		return "Scene " + (name == null?"":name);
 	}
 
 }
