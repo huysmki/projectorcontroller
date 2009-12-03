@@ -66,7 +66,6 @@ public class ImagePanel extends JPanel implements Runnable {
         g2d.drawImage(currentImage, 0, 0, this.getWidth(), this.getHeight(), null);
 	}
 
-	@Override
 	public void run() {
 		if (fadeIn) {
 			while (alpha < 1 && running ) {

@@ -1,25 +1,19 @@
 package be.rhea.projector.controller.remote.commands.server;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.media.CachingControl;
 import javax.media.CachingControlEvent;
-import javax.media.CannotRealizeException;
 import javax.media.ControllerClosedEvent;
 import javax.media.ControllerErrorEvent;
 import javax.media.ControllerEvent;
 import javax.media.ControllerListener;
 import javax.media.DurationUpdateEvent;
-import javax.media.Manager;
 import javax.media.MediaLocator;
 import javax.media.MediaTimeSetEvent;
-import javax.media.NoPlayerException;
 import javax.media.Player;
 import javax.media.PrefetchCompleteEvent;
 import javax.media.RateChangeEvent;
@@ -27,16 +21,10 @@ import javax.media.RealizeCompleteEvent;
 import javax.media.SizeChangeEvent;
 import javax.media.StartEvent;
 import javax.media.StopTimeChangeEvent;
-import javax.media.Time;
 import javax.media.TransitionEvent;
 import javax.media.bean.playerbean.MediaPlayer;
 import javax.media.format.FormatChangeEvent;
 import javax.swing.JFrame;
-
-import jmapps.ui.MessageDialog;
-import jmapps.ui.VideoPanel;
-
-import com.sun.media.util.JMFI18N;
 
 import be.rhea.projector.controller.client.ui.VideoMediaPanel;
 import be.rhea.remote.server.SimpleProtocolServerExecuteCommand;
