@@ -152,7 +152,6 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 		exit.addActionListener(this);
 	}
 
-	@Override
 	public void actionPerformed(ActionEvent actionEvent) {
 		Scenario currentScenario = scenarioViewer.getScenario();
 		if (NEW_SCENARIO.equals(actionEvent.getActionCommand())) {
@@ -228,7 +227,6 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 		}
 	}
 
-	@Override
 	public void valueChanged(TreeSelectionEvent e) {
 		if (!ScenarioPlayer.isPlaying() && !ScenarioPlayer.isPaused()) {
 			TreePath selectionPath = e.getNewLeadSelectionPath();
@@ -246,7 +244,6 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 		}
 	}
 
-	@Override
 	public void stateChanged(StateChangedEvent e) {
 		if (e.getNewState().equals(State.STOP)) {
 			playButton.setEnabled(scenarioViewer.getSelectedObject() instanceof Scene);

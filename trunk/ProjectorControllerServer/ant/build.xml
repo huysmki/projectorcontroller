@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="create_run_jar" name="Create Runnable Jar for Project PlayMovieServer">
+<project default="create_run_jar" name="Create Runnable Jar for Project PlayMovieServer" basedir=".">
     <!--this file was created by Eclipse Runnable JAR Export Wizard-->
     <!--ANT 1.7 is required                                        -->
     <target name="create_run_jar">
-        <jar destfile="C:/Custom/workspace/PlayMovieServer/ant/ProjectorServer.jar" filesetmanifest="mergewithoutmain">
+        <jar destfile="ProjectorServer.jar" filesetmanifest="mergewithoutmain">
             <manifest>
                 <attribute name="Built-By" value="${user.name}"/>
                 <attribute name="Main-Class" value="be.rhea.projector.controller.server.ProjectorControllerServer"/>
                 <attribute name="Class-Path" value="."/>
             </manifest>
-            <fileset dir="C:/Custom/workspace/PlayMovieServer/bin"/>
-            <fileset dir="C:/Custom/workspace/PlayMovieCommon/bin"/>
-            <zipfileset excludes="META-INF/*.SF" src="C:/Custom/workspace/PlayMovieCommon/lib/ostermillerutils_1_02_27.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="C:/Custom/workspace/PlayMovieCommon/lib/tar.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="C:/Custom/eclipse/plugins/org.eclipse.swt.win32.win32.x86_3.4.1.v3452b.jar"/>
+            <fileset dir="../bin"/>
+            <fileset dir="../../PlayMovieCommon/bin"/>
+            <zipfileset excludes="META-INF/*.SF" src="../../PlayMovieCommon/lib/ostermillerutils_1_02_27.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../../PlayMovieCommon/lib/tar.jar"/>
         </jar>
     </target>
 </project>

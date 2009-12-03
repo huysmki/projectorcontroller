@@ -22,7 +22,6 @@ public class IPTableCellEditor extends AbstractCellEditor implements
 		this.value = value;
 	}
 
-	@Override
 	public Component getTableCellEditorComponent(JTable jtable, Object obj,
 			boolean flag, int i, int j) {
 		textField = new JFormattedTextField(value);
@@ -61,7 +60,6 @@ public class IPTableCellEditor extends AbstractCellEditor implements
 		return false;
 	}
 	
-	@Override
 	public Object getCellEditorValue() {
 		return textField.getText();
 	}
