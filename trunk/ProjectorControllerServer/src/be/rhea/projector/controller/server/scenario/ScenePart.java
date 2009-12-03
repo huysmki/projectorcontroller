@@ -46,6 +46,6 @@ public class ScenePart implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "ScenePart " + name;
+		return "ScenePart " + (name == null?"":name);
 	}
 }
