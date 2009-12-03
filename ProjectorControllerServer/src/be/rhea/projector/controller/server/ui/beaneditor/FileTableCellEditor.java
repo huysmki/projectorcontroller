@@ -24,7 +24,6 @@ public class FileTableCellEditor extends AbstractCellEditor implements
 		this.fileName = fileName;
 	}
 
-	@Override
 	public Component getTableCellEditorComponent(JTable jtable, Object obj,
 			boolean flag, int i, int j) {
 		// TODO Auto-generated method stub
@@ -40,12 +39,10 @@ public class FileTableCellEditor extends AbstractCellEditor implements
 		return panel;
 	}
 
-	@Override
 	public Object getCellEditorValue() {
 		return fileName;
 	}
 
-	@Override
 	public void actionPerformed(ActionEvent actionevent) {
 		JFileChooser fileChooser = new JFileChooser();
 		if (fileChooser.showDialog(null, "Select")== JFileChooser.APPROVE_OPTION) {

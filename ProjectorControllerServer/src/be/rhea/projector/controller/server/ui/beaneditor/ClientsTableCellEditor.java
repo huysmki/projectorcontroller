@@ -23,7 +23,6 @@ public class ClientsTableCellEditor extends AbstractCellEditor implements
 		this.clients = clients;
 	}
 
-	@Override
 	public Component getTableCellEditorComponent(JTable jtable, Object obj,
 			boolean flag, int i, int j) {
 		comboBox = new JComboBox();
@@ -39,7 +38,6 @@ public class ClientsTableCellEditor extends AbstractCellEditor implements
 		return comboBox;
 	}
 
-	@Override
 	public Object getCellEditorValue() {
 		Client selectedClient = (Client)comboBox.getSelectedItem();
 		if (selectedClient == null) {

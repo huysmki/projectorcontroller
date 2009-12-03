@@ -25,7 +25,6 @@ public class ColorTableCellEditor extends AbstractCellEditor implements
 		this.color = color;
 	}
 
-	@Override
 	public Component getTableCellEditorComponent(JTable jtable, Object obj,
 			boolean flag, int i, int j) {
 		JPanel panel = new JPanel();
@@ -43,7 +42,6 @@ public class ColorTableCellEditor extends AbstractCellEditor implements
 		return panel;
 	}
 	
-	@Override
 	public Object getCellEditorValue() {
 		return colorToString();
 	}
@@ -52,7 +50,6 @@ public class ColorTableCellEditor extends AbstractCellEditor implements
 		return color == null?"":color.getRed()+ "," + color.getGreen() + "," + color.getBlue();
 	}
 
-	@Override
 	public void actionPerformed(ActionEvent actionevent) {
 		Color newColor = JColorChooser.showDialog(null, "Choose a color", color);
 		if (newColor != null) {

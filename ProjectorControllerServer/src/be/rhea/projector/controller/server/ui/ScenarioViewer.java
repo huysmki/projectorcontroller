@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -20,6 +21,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import be.rhea.projector.controller.server.annotation.EditableProperty;
 import be.rhea.projector.controller.server.scenario.Client;
 import be.rhea.projector.controller.server.scenario.Scenario;
 import be.rhea.projector.controller.server.scenario.Scene;
@@ -30,10 +32,11 @@ import be.rhea.projector.controller.server.scenario.actions.ArtNetAction;
 import be.rhea.projector.controller.server.scenario.actions.ColorAction;
 import be.rhea.projector.controller.server.scenario.actions.FadeOutImageAction;
 import be.rhea.projector.controller.server.scenario.actions.LoadImageAction;
-import be.rhea.projector.controller.server.scenario.actions.StartVideoAction;
 import be.rhea.projector.controller.server.scenario.actions.ManualAcknownledgeAction;
 import be.rhea.projector.controller.server.scenario.actions.PlayImageAction;
+import be.rhea.projector.controller.server.scenario.actions.RepeatScenePartAction;
 import be.rhea.projector.controller.server.scenario.actions.SleepAction;
+import be.rhea.projector.controller.server.scenario.actions.StartVideoAction;
 import be.rhea.projector.controller.server.scenario.actions.StopVideoAction;
 import be.rhea.projector.controller.server.scenario.actions.TransitionColorAction;
 import be.rhea.projector.controller.server.ui.beaneditor.BeanEditor;
@@ -45,7 +48,8 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 	private static final String ADD_ACTION = "ADD_ACTION";
 	private static final String MOVE_DOWN = "MOVE_ACTION_DOWN";
 	private static final String MOVE_UP = "MOVE_ACTION_UP";
-	private static final String REMOVE = "REMOVE_ACTION";
+	private static final String REMOVE = "REMOVE";
+	private static final String DUPLICATE = "DUPLICATE";
 	private static final String ADD_SCENE = "ADD_SCENE";
 	private static final String ADD_SCENEPART = "ADD_SCENEPART";
 	private final BeanEditor beanEditor;
@@ -143,19 +147,15 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 		this.setModel(new DefaultTreeModel(scenarioItem));
 	}
 
-	@Override
 	public void mouseClicked(MouseEvent mouseevent) {
 	}
 
-	@Override
 	public void mouseEntered(MouseEvent mouseevent) {
 	}
 
-	@Override
 	public void mouseExited(MouseEvent mouseevent) {
 	}
 
-	@Override
 	public void mousePressed(MouseEvent mouseEvent) {
 		if (selectedObject != null) {
 			if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
@@ -190,6 +190,7 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 		if (selectedObject instanceof AbstractAction) {
 			addRemoveMenuItem(popupMenu);			
 			addMoveUpDownMenuItems(popupMenu);
+			addDuplicateMenuItem(popupMenu);			
 		}
 		if (selectedObject instanceof Scene || sceneItem == selectedTreeNode) {
 			JMenuItem addSceneMenuItem = new JMenuItem("Add Scene");
@@ -210,6 +211,12 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 	
 	}
 
+	private void addDuplicateMenuItem(JPopupMenu popupMenu) {
+		JMenuItem removeActionMenuItem = new JMenuItem("Duplicate");
+		removeActionMenuItem.setActionCommand(DUPLICATE);
+		removeActionMenuItem.addActionListener(this);
+		popupMenu.add(removeActionMenuItem);
+	}
 	private void addRemoveMenuItem(JPopupMenu popupMenu) {
 		JMenuItem removeActionMenuItem = new JMenuItem("Remove");
 		removeActionMenuItem.setActionCommand(REMOVE);
@@ -248,7 +255,6 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 		return clients;
 	}
 
-	@Override
 	public void mouseReleased(MouseEvent mouseevent) {
 	}
 
@@ -256,7 +262,6 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 		return selectedObject;
 	}
 
-	@Override
 	public void actionPerformed(ActionEvent event) {
 		if (REMOVE_CLIENT.equals(event.getActionCommand())) {
 			if (JOptionPane.showConfirmDialog(null, "Are you sure?", "Delete", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
@@ -305,7 +310,8 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 					                        new FadeOutImageAction(),
 					                        new StartVideoAction(),
 					                        new StopVideoAction(),
-					                        new ArtNetAction()};
+					                        new ArtNetAction(),
+					                        new RepeatScenePartAction()};
 			Object selectedAction = JOptionPane.showInputDialog(null, "Select Action to add", "Select action", JOptionPane.QUESTION_MESSAGE, null, actions, null);
 			if (selectedAction != null) {
 				
@@ -356,6 +362,18 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 				DefaultTreeModel model = (DefaultTreeModel) this.getModel();
 				model.removeNodeFromParent(selectedTreeNode);
 			}
+		} else if (DUPLICATE.equals(event.getActionCommand())) {
+			Object clonedObject = clone(selectedObject);
+			DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(clonedObject);
+			DefaultMutableTreeNode parent = (DefaultMutableTreeNode)selectedTreeNode.getParent();
+			int index = parent.getIndex(selectedTreeNode);
+			parent.insert(newNode, index + 1);
+			DefaultTreeModel model = (DefaultTreeModel) this.getModel();
+			if (model != null) {
+				model.nodeStructureChanged(parent);
+			}					
+			setTreeNodeAsSelected(newNode);
+
 		} else if (ADD_SCENE.equals(event.getActionCommand())) {
 			DefaultMutableTreeNode newSceneNode = new DefaultMutableTreeNode(new Scene());
 			if (selectedTreeNode == sceneItem) {
@@ -395,13 +413,43 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 		}
 	}
 
+	private Object clone(Object objectToClone) {
+		try {
+			Object clonedObject = objectToClone.getClass().newInstance();
+			copyProperties (clonedObject, objectToClone, objectToClone.getClass());
+			return clonedObject; 
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	private void copyProperties(Object clonedObject, Object objectToClone, Class<? extends Object> clazz) throws IllegalArgumentException, IllegalAccessException {
+		Class<?> superclass = clazz.getSuperclass();
+		if (!superclass.equals(Object.class)) {
+			copyProperties(clonedObject, objectToClone, superclass);
+		}
+		
+		Field[] fields = clazz.getDeclaredFields();
+		for (int i = 0; i < fields.length; i++) {
+			Field field = fields[i];
+			if (field.isAnnotationPresent(EditableProperty.class)) {
+				field.setAccessible(true);
+				Object value = field.get(objectToClone);
+				field.set(clonedObject, value);
+			}
+		}
+	}
+
 	private void setTreeNodeAsSelected(DefaultMutableTreeNode newClientNode) {
 		TreePath treePath = new TreePath(newClientNode.getPath());
 		this.setSelectionPath(treePath);
 		this.scrollPathToVisible(treePath);
 	}
 
-	@Override
 	public void valueChanged(TreeSelectionEvent event) {
 		beanEditor.stopEditing();
 		DefaultTreeModel model = (DefaultTreeModel) this.getModel();

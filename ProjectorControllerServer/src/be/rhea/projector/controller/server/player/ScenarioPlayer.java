@@ -15,12 +15,11 @@ import be.rhea.projector.controller.server.scenario.actions.AbstractAction;
 import be.rhea.projector.controller.server.scenario.actions.AbstractClientAction;
 import be.rhea.projector.controller.server.scenario.actions.ArtNetAction;
 import be.rhea.projector.controller.server.scenario.actions.ManualAcknownledgeAction;
+import be.rhea.projector.controller.server.scenario.actions.RepeatScenePartAction;
 import be.rhea.projector.controller.server.scenario.actions.SleepAction;
 import be.rhea.remote.PCP;
-import be.rhea.remote.client.ArtNetProtocolUDPClient;
 import be.rhea.remote.client.ArtNetProtocolUDPWithRetryClient;
 import be.rhea.remote.client.SimpleProtocolClient;
-import be.rhea.remote.client.SimpleProtocolUDPClient;
 import be.rhea.remote.client.SimpleProtocolUDPWithRetryClient;
 
 public class ScenarioPlayer implements Runnable {
@@ -116,50 +115,60 @@ public class ScenarioPlayer implements Runnable {
 		}
 	}	
 
-	@Override
 	public void run() {
 		List<Client> clients = scenarioToPlay.getClients();
 		
 		Scene scene = scenarioToPlay.getScenes().get(sceneIdToPlay);
+//		Map<Integer, ConcurrentLinkedQueue<byte[]>> queueMap = new HashMap<Integer, ConcurrentLinkedQueue<byte[]>>();
+//		for (Client client : clients) {
+//			ConcurrentLinkedQueue<byte[]> queue = new ConcurrentLinkedQueue<byte[]>();
+//		}
 		
 		List<ScenePart> sceneParts = scene.getSceneParts();
 		for (ScenePart scenePart : sceneParts) {
-			List<AbstractAction> actions = scenePart.getActions();
-			for (AbstractAction action : actions) {
-				if (!isPlaying) {
-					return;
-				}
-				while (isPaused) {
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
+			boolean repeatScenePart = false;
+			int repeatCount = 0;
+			do {
+				List<AbstractAction> actions = scenePart.getActions();
+				for (AbstractAction action : actions) {
+					if (!isPlaying) {
 						return;
 					}
-				}
-				String command = action.getCommand();
-				if (action instanceof SleepAction) {
-					try {
-						Thread.sleep(((SleepAction)action).getTime());
-					} catch (InterruptedException e) {
-						//TODO log
-						e.printStackTrace();
+					while (isPaused) {
+						try {
+							Thread.sleep(100);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+							return;
+						}
 					}
-					
-				} else if (action instanceof ManualAcknownledgeAction) {
-					ManualAcknownledgeAction manualAcknowledgeAction = (ManualAcknownledgeAction) action; 
-					JOptionPane.showMessageDialog(null, manualAcknowledgeAction.getMessage()!= null?manualAcknowledgeAction.getMessage():"Please Aknowledge");
-				} else if (action instanceof ArtNetAction) {
-					int clientId = ((AbstractClientAction) action).getClientId();
-					Client client = getClientForId(clients, clientId);
-					sendArtNetCommand(client, ((ArtNetAction)action).getValues());
+					String command = action.getCommand();
+					if (action instanceof SleepAction) {
+						try {
+							Thread.sleep(((SleepAction)action).getTime());
+						} catch (InterruptedException e) {
+							//TODO log
+							e.printStackTrace();
+						}
+						
+					} else if (action instanceof ManualAcknownledgeAction) {
+						ManualAcknownledgeAction manualAcknowledgeAction = (ManualAcknownledgeAction) action; 
+						JOptionPane.showMessageDialog(null, manualAcknowledgeAction.getMessage()!= null?manualAcknowledgeAction.getMessage():"Please Aknowledge");
+					} else if (action instanceof RepeatScenePartAction && !repeatScenePart) {
+						RepeatScenePartAction repreatScenePartAction = (RepeatScenePartAction) action;
+						repeatScenePart = true;
+						repeatCount = repreatScenePartAction.getCount();
+					} else if (action instanceof ArtNetAction) {
+						int clientId = ((AbstractClientAction) action).getClientId();
+						Client client = getClientForId(clients, clientId);
+						sendArtNetCommand(client, ((ArtNetAction)action).getValues());
+					} else if (action instanceof AbstractClientAction){
+						int clientId = ((AbstractClientAction) action).getClientId();
+						Client client = getClientForId(clients, clientId);
+						sendSimpleProtocolCommand(client, command, action.getParameters());
+					}
 				}
-				 else if (action instanceof AbstractClientAction){
-					int clientId = ((AbstractClientAction) action).getClientId();
-					Client client = getClientForId(clients, clientId);
-					sendSimpleProtocolCommand(client, command, action.getParameters());
-				}
-			}
+			} while (repeatScenePart && (repeatCount < 0 || repeatCount-- > 0));
 		}
 		isPlaying = false;
 		isPaused = false;

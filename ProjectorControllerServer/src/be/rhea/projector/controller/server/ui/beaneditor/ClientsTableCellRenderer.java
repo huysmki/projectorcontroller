@@ -22,12 +22,10 @@ public class ClientsTableCellRenderer extends AbstractCellEditor implements
 		this.clients = clients;
 	}
 
-	@Override
 	public Object getCellEditorValue() {
 		return clientId;
 	}
 
-	@Override
 	public Component getTableCellRendererComponent(JTable jtable, Object obj,
 			boolean flag, boolean flag1, int i, int j) {
 		textField = new JTextField();

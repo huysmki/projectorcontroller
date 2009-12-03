@@ -32,7 +32,6 @@ public class ArtNetTableCellEditor extends AbstractCellEditor implements
 		this.data = data;
 	}
 
-	@Override
 	public Component getTableCellEditorComponent(JTable jtable, Object obj,
 			boolean flag, int i, int j) {
 		JPanel panel = new JPanel();
@@ -49,7 +48,6 @@ public class ArtNetTableCellEditor extends AbstractCellEditor implements
 		return panel;
 	}
 	
-	@Override
 	public Object getCellEditorValue() {
 		return dataToString();
 	}
@@ -67,7 +65,6 @@ public class ArtNetTableCellEditor extends AbstractCellEditor implements
 		return builder.toString();
 	}
 	
-	@Override
 	public void actionPerformed(ActionEvent actionevent) {
         ArtNetValueChangeDialog myDialog = new ArtNetValueChangeDialog(null, true, "Edit Values", data);
         if(myDialog.getAnswer()) {
@@ -178,7 +175,6 @@ public class ArtNetTableCellEditor extends AbstractCellEditor implements
 			this.add(slider);
 		}
 
-		@Override
 		public void stateChanged(ChangeEvent changeevent) {
 			value = slider.getValue();
 			valueField.setText(String.valueOf(value));
