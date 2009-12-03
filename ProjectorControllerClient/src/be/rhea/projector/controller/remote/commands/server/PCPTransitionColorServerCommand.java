@@ -25,7 +25,6 @@ public class PCPTransitionColorServerCommand implements
 		this.mediaPanel = colorPanel;
 	}
 
-	@Override
 	public String execute(String[] parameters) {
 		frame.getContentPane().removeAll();
 		frame.getContentPane().add(mediaPanel);
@@ -50,7 +49,6 @@ public class PCPTransitionColorServerCommand implements
 		return "TransitionColor Loaded";
 	}
 
-	@Override
 	public void run() {
 		int sleeptime = time / 255;
 		float deltaR = ((float)(toR - fromR)) / 255;

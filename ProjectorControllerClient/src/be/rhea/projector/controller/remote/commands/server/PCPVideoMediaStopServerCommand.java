@@ -14,7 +14,6 @@ public class PCPVideoMediaStopServerCommand implements
 		this.mediaPanel = mediaPanel;
 	}
 
-	@Override
 	public String execute(String[] parameters) {
 		Player mediaPlayer = mediaPanel.getMediaPlayer();
 		mediaPlayer.stop();
