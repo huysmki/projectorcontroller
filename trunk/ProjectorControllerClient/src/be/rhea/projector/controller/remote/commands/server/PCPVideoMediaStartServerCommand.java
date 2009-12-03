@@ -44,7 +44,6 @@ public class PCPVideoMediaStartServerCommand implements
 		this.mediaPanel = mediaPanel;
 	}
 
-	@Override
 	public String execute(String[] parameters) {
 		frame.getContentPane().removeAll();
 		frame.getContentPane().add(mediaPanel);
@@ -106,7 +105,6 @@ public class PCPVideoMediaStartServerCommand implements
 		this.mediaDir = mediaDir;
 	}
 
-	@Override
     public synchronized void controllerUpdate ( ControllerEvent event ) {
         if ( event instanceof RealizeCompleteEvent ) {
             processRealizeComplete ( (RealizeCompleteEvent) event );

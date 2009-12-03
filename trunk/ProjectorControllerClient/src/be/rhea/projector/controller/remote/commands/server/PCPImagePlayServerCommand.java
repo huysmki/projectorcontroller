@@ -16,7 +16,6 @@ public class PCPImagePlayServerCommand implements
 		this.mediaPanel = imagePanel;
 	}
 
-	@Override
 	public String execute(String[] parameters) {
 		int fadeInTime = Integer.valueOf(parameters[0]);
 		frame.getContentPane().removeAll();

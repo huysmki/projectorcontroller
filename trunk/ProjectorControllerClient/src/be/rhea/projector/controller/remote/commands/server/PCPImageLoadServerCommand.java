@@ -24,7 +24,6 @@ public class PCPImageLoadServerCommand implements
 		this.mediaPanel = imagePanel;
 	}
 
-	@Override
 	public String execute(String[] parameters) {
 		imageName = parameters[0];
 		
@@ -34,7 +33,6 @@ public class PCPImageLoadServerCommand implements
 		return "Image Loaded";
 	}
 
-	@Override
 	public void run() {
 		try {
 			File file = new File(mediaDir, imageName);
