@@ -30,7 +30,7 @@ public class FileTableCellEditor extends AbstractCellEditor implements
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
 		textField = new JTextField(fileName);
-		textField.setEditable(false);
+//		textField.setEditable(false);
 		panel.add(textField, BorderLayout.CENTER);
 		JButton button = new JButton("...");
 		button.setPreferredSize(new Dimension(20,20));
@@ -40,7 +40,7 @@ public class FileTableCellEditor extends AbstractCellEditor implements
 	}
 
 	public Object getCellEditorValue() {
-		return fileName;
+		return textField.getText();
 	}
 
 	public void actionPerformed(ActionEvent actionevent) {

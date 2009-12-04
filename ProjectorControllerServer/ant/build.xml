@@ -10,9 +10,7 @@
                 <attribute name="Class-Path" value="."/>
             </manifest>
             <fileset dir="../bin"/>
-            <fileset dir="../../PlayMovieCommon/bin"/>
-            <zipfileset excludes="META-INF/*.SF" src="../../PlayMovieCommon/lib/ostermillerutils_1_02_27.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="../../PlayMovieCommon/lib/tar.jar"/>
+            <fileset dir="../../ProjectorControllerCommon/bin"/>
         </jar>
     </target>
 </project>

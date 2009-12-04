@@ -1,21 +1,16 @@
 package be.rhea.projector.controller.server.scenario.actions;
 
-import be.rhea.projector.controller.server.annotation.EditableProperty;
-import be.rhea.projector.controller.server.annotation.EditableProperty.Type;
 import be.rhea.remote.PCP;
 
-public class StartVideoAction extends AbstractClientAction {
+public class StartVideoAction extends AbstractVideoAction {
 	private static final long serialVersionUID = -1524974021847781782L;
-	@EditableProperty(name = "Filename", type = Type.FILE)
-	private String fileName;
 
 	public StartVideoAction() {
-		super(null, 0);
+		super(null, 0, null);
 	}
 
 	public StartVideoAction(String name, int clientId, String fileName) {
-		super(name, clientId);
-		this.setFileName(fileName);
+		super(name, clientId, fileName);
 	}
 
 	@Override
@@ -24,20 +19,7 @@ public class StartVideoAction extends AbstractClientAction {
 	}
 
 	@Override
-	public String[] getParameters() {
-		return new String[]{fileName};
-	}
-
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-
-	public String getFileName() {
-		return fileName;
-	}
-	
-	@Override
 	public String toString() {
-		return "Start Video " + (fileName != null?fileName:"") + super.toString();
+		return "Start Video " + super.toString();
 	}
 }

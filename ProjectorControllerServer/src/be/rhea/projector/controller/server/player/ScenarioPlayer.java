@@ -153,7 +153,17 @@ public class ScenarioPlayer implements Runnable {
 						
 					} else if (action instanceof ManualAcknownledgeAction) {
 						ManualAcknownledgeAction manualAcknowledgeAction = (ManualAcknownledgeAction) action; 
-						JOptionPane.showMessageDialog(null, manualAcknowledgeAction.getMessage()!= null?manualAcknowledgeAction.getMessage():"Please Aknowledge");
+						String message = manualAcknowledgeAction.getMessage()!= null?manualAcknowledgeAction.getMessage():"Please Aknowledge";
+						int clickedButton = JOptionPane.showConfirmDialog(null, message,"Acknowledge", JOptionPane.OK_CANCEL_OPTION);
+						if (clickedButton == JOptionPane.CANCEL_OPTION) {
+							clickedButton = JOptionPane.showConfirmDialog(null, "Do you want to stop the scenario?","Cancel scenario", JOptionPane.YES_NO_OPTION);
+							if (clickedButton == JOptionPane.YES_OPTION) {
+								isPlaying = false;
+								isPaused = false;
+								fireStateChangeListeners(new StateChangedEvent(State.STOP));
+								return;
+							}
+						}
 					} else if (action instanceof RepeatScenePartAction && !repeatScenePart) {
 						RepeatScenePartAction repreatScenePartAction = (RepeatScenePartAction) action;
 						repeatScenePart = true;

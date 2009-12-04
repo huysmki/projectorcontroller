@@ -4,6 +4,7 @@ package be.rhea.projector.controller.client;
 // A simple media player
 import java.awt.Color;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -21,12 +22,12 @@ import be.rhea.projector.controller.remote.commands.server.PCPImageLoadServerCom
 import be.rhea.projector.controller.remote.commands.server.PCPImagePlayServerCommand;
 import be.rhea.projector.controller.remote.commands.server.PCPMediaTarFileTransferServerCommand;
 import be.rhea.projector.controller.remote.commands.server.PCPTransitionColorServerCommand;
+import be.rhea.projector.controller.remote.commands.server.PCPVideoMediaPreloadServerCommand;
 import be.rhea.projector.controller.remote.commands.server.PCPVideoMediaStartServerCommand;
 import be.rhea.projector.controller.remote.commands.server.PCPVideoMediaStopServerCommand;
 import be.rhea.remote.PCP;
 import be.rhea.remote.server.SimpleProtocolServer;
 import be.rhea.remote.server.SimpleProtocolServerCommand;
-import be.rhea.remote.server.SimpleProtocolUDPServer;
 import be.rhea.remote.server.SimpleProtocolUDPWithRetryServer;
 
 public class ProjectorControllerClient {
@@ -46,7 +47,7 @@ public class ProjectorControllerClient {
 		ColorPanel colorPanel = new ColorPanel();
 		ColorPanel transitionColorPanel = new ColorPanel();
 		ImagePanel imagePanel = new ImagePanel();
-		VideoMediaPanel mediaPanel = new VideoMediaPanel();
+		Map<String,VideoMediaPanel> mediaPanelMap = Collections.synchronizedMap(new HashMap<String,VideoMediaPanel>());
 		
 		Map<String, SimpleProtocolServerCommand> commandMap = new HashMap<String, SimpleProtocolServerCommand>();
 		
@@ -54,10 +55,14 @@ public class ProjectorControllerClient {
 		mediaTarFileTransferServerCommand.setMediaDir("c:/temp/" + port);
 		commandMap.put(PCP.PROTOCOL + ":" + PCP.UPLOAD_MEDIA, mediaTarFileTransferServerCommand);
 		
-		PCPVideoMediaStartServerCommand videoMediaStartServerCommand = new PCPVideoMediaStartServerCommand(frame, mediaPanel);
+		PCPVideoMediaStartServerCommand videoMediaStartServerCommand = new PCPVideoMediaStartServerCommand(frame, mediaPanelMap);
 		videoMediaStartServerCommand.setMediaDir("c:/temp/" + port);
 		commandMap.put(PCP.PROTOCOL + ":" + PCP.START_VIDEO_MEDIA, videoMediaStartServerCommand);
 		
+		PCPVideoMediaPreloadServerCommand videoMediaPreloadServerCommand = new PCPVideoMediaPreloadServerCommand(mediaPanelMap);
+		videoMediaPreloadServerCommand.setMediaDir("c:/temp/" + port);
+		commandMap.put(PCP.PROTOCOL + ":" + PCP.PRELOAD_VIDEO_MEDIA, videoMediaPreloadServerCommand);
+
 		PCPColorServerCommand colorLoadServerCommand = new PCPColorServerCommand(frame, colorPanel);
 		commandMap.put(PCP.PROTOCOL + ":" + PCP.START_COLOR, colorLoadServerCommand);
 
@@ -74,7 +79,7 @@ public class ProjectorControllerClient {
 		PCPImageFadeOutServerCommand imageFadeOutServerCommand = new PCPImageFadeOutServerCommand(frame, imagePanel);
 		commandMap.put(PCP.PROTOCOL + ":" + PCP.FADE_OUT_IMAGE, imageFadeOutServerCommand);
 
-		PCPVideoMediaStopServerCommand videoMediaStopServerCommand = new PCPVideoMediaStopServerCommand(mediaPanel);
+		PCPVideoMediaStopServerCommand videoMediaStopServerCommand = new PCPVideoMediaStopServerCommand(frame, mediaPanelMap);
 		commandMap.put(PCP.PROTOCOL + ":" + PCP.STOP_VIDEO_MEDIA, videoMediaStopServerCommand);
 
 //		SimpleProtocolServer server = new SimpleProtocolTCPServer(port, PCP.PROTOCOL);
