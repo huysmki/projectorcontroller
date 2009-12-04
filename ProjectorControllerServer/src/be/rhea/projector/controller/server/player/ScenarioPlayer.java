@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JOptionPane;
-
 import be.rhea.projector.controller.server.player.StateChangedEvent.State;
 import be.rhea.projector.controller.server.scenario.Client;
 import be.rhea.projector.controller.server.scenario.Scenario;
@@ -154,16 +152,8 @@ public class ScenarioPlayer implements Runnable {
 					} else if (action instanceof ManualAcknownledgeAction) {
 						ManualAcknownledgeAction manualAcknowledgeAction = (ManualAcknownledgeAction) action; 
 						String message = manualAcknowledgeAction.getMessage()!= null?manualAcknowledgeAction.getMessage():"Please Aknowledge";
-						int clickedButton = JOptionPane.showConfirmDialog(null, message,"Acknowledge", JOptionPane.OK_CANCEL_OPTION);
-						if (clickedButton == JOptionPane.CANCEL_OPTION) {
-							clickedButton = JOptionPane.showConfirmDialog(null, "Do you want to stop the scenario?","Cancel scenario", JOptionPane.YES_NO_OPTION);
-							if (clickedButton == JOptionPane.YES_OPTION) {
-								isPlaying = false;
-								isPaused = false;
-								fireStateChangeListeners(new StateChangedEvent(State.STOP));
-								return;
-							}
-						}
+						isPaused = true;
+						fireStateChangeListeners(new StateChangedEvent(State.MANUAL_ACKNOWLEDGE, message));
 					} else if (action instanceof RepeatScenePartAction && !repeatScenePart) {
 						RepeatScenePartAction repreatScenePartAction = (RepeatScenePartAction) action;
 						repeatScenePart = true;
