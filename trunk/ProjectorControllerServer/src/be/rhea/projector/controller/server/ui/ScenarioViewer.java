@@ -34,6 +34,7 @@ import be.rhea.projector.controller.server.scenario.actions.FadeOutImageAction;
 import be.rhea.projector.controller.server.scenario.actions.LoadImageAction;
 import be.rhea.projector.controller.server.scenario.actions.ManualAcknownledgeAction;
 import be.rhea.projector.controller.server.scenario.actions.PlayImageAction;
+import be.rhea.projector.controller.server.scenario.actions.PreloadVideoAction;
 import be.rhea.projector.controller.server.scenario.actions.RepeatScenePartAction;
 import be.rhea.projector.controller.server.scenario.actions.SleepAction;
 import be.rhea.projector.controller.server.scenario.actions.StartVideoAction;
@@ -308,6 +309,7 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 					                        new LoadImageAction(),
 					                        new PlayImageAction(),
 					                        new FadeOutImageAction(),
+					                        new PreloadVideoAction(),
 					                        new StartVideoAction(),
 					                        new StopVideoAction(),
 					                        new ArtNetAction(),
