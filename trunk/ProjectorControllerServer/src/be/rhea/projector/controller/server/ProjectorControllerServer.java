@@ -2,6 +2,7 @@ package be.rhea.projector.controller.server;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.XMLDecoder;
@@ -11,9 +12,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -24,10 +28,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
 
 import be.rhea.projector.controller.server.filefilter.XMLFileFilter;
 import be.rhea.projector.controller.server.player.ScenarioPlayer;
@@ -39,7 +39,7 @@ import be.rhea.projector.controller.server.scenario.Scene;
 import be.rhea.projector.controller.server.ui.ScenarioViewer;
 import be.rhea.projector.controller.server.ui.beaneditor.BeanEditor;
 
-public class ProjectorControllerServer extends JFrame implements ActionListener, TreeSelectionListener, StateChangedListener {
+public class ProjectorControllerServer extends JFrame implements ActionListener, StateChangedListener {
 	private static final String TITLE = "Projector Controller";
 	private static final long serialVersionUID = 1L;
 	private static final String OPEN = "OPEN";
@@ -50,12 +50,14 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 	private static final String STOP_SCENE = "STOP_SCENE";
 	private static final String NEW_SCENARIO = "NEW_SCENARIO";
 	private static final String EXIT = "EXIT";
+	private static final String REFRESH_SCENES = "REFRESH_SCENES";
 	private ScenarioViewer scenarioViewer;
 	private File selectedFile;
 	private JButton playButton;
 	private JButton pauseButton;
 	private JButton stopButton;
 	private JLabel statusLabel;
+	private JComboBox selectedSceneForPlayerComboBox;
 
 	public static void main(String[] args) throws Exception {
 		ProjectorControllerServer server = new ProjectorControllerServer();
@@ -80,7 +82,6 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 		JScrollPane scrollPane = new JScrollPane();
 		scenarioViewer = new ScenarioViewer(beanEditor);
 		scenarioViewer.setSize(600, 300);
-		scenarioViewer.addTreeSelectionListener(this);
 		scrollPane.getViewport().add(scenarioViewer);
 		splitpane.setLeftComponent(scrollPane);
 		splitpane.setDividerLocation(400);
@@ -97,9 +98,14 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 
 	private JToolBar createToolBar() {
 		ImageIcon playIcon = new ImageIcon(this.getClass().getResource("/play.png"));
+		ImageIcon refreshIcon = new ImageIcon(this.getClass().getResource("/refresh.png"));
 		ImageIcon pauseIcon = new ImageIcon(this.getClass().getResource("/pause.png"));
 		ImageIcon stopIcon = new ImageIcon(this.getClass().getResource("/stop.png"));
 		JToolBar toolbar = new JToolBar();
+		JButton refreshButton = new JButton();
+		refreshButton.setIcon(refreshIcon);
+		refreshButton.setActionCommand(REFRESH_SCENES);
+		refreshButton.addActionListener(this);
 		playButton = new JButton();
 		playButton.setIcon(playIcon);
 		playButton.setActionCommand(PLAY_SCENE);
@@ -115,9 +121,17 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 		stopButton.setActionCommand(STOP_SCENE);
 		stopButton.addActionListener(this);
 		stopButton.setEnabled(false);
+		toolbar.add(new JLabel("Scene : "));
+		selectedSceneForPlayerComboBox = new JComboBox();
+		selectedSceneForPlayerComboBox.setMaximumSize(new Dimension(200,25));
+		toolbar.add(selectedSceneForPlayerComboBox);
+		toolbar.add(refreshButton);
+		toolbar.addSeparator(new Dimension(10,10));
 		toolbar.add(playButton);
 		toolbar.add(pauseButton);
+		toolbar.addSeparator(new Dimension(10,10));
 		toolbar.add(stopButton);
+		toolbar.addSeparator(new Dimension(10,10));
 		statusLabel = new JLabel("");
 		toolbar.add(statusLabel);
 		return toolbar;
@@ -172,21 +186,21 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 					decoder.close();
 					scenarioViewer.setScenario(currentScenario);
 					this.setTitle(TITLE + " " + selectedFile);
+					populateSelectedSceneForPlayerComboBox();
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 		} else if (PLAY_SCENE.equals(actionEvent.getActionCommand())) {
-			if (scenarioViewer.getSelectedObject() instanceof Scene) {
-				int indexOf = currentScenario.getScenes().indexOf(
-						scenarioViewer.getSelectedObject());
-				ScenarioPlayer.setScenario(currentScenario);
-				ScenarioPlayer.play(indexOf);
-				playButton.setEnabled(false);
-				pauseButton.setEnabled(true);
-				stopButton.setEnabled(true);
-			}
+				int indexOf = selectedSceneForPlayerComboBox.getSelectedIndex();
+				if (indexOf >= 0) {
+					ScenarioPlayer.setScenario(currentScenario);
+					ScenarioPlayer.play(indexOf);
+					playButton.setEnabled(false);
+					pauseButton.setEnabled(true);
+					stopButton.setEnabled(true);
+				}
 		} else if (PAUSE_SCENE.equals(actionEvent.getActionCommand())) {
 				ScenarioPlayer.pause();
 		} else if (STOP_SCENE.equals(actionEvent.getActionCommand())) {
@@ -194,6 +208,8 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 				playButton.setEnabled(true);
 				pauseButton.setEnabled(false);
 				stopButton.setEnabled(false);				
+		} else if (REFRESH_SCENES.equals(actionEvent.getActionCommand())) {
+				populateSelectedSceneForPlayerComboBox();
 		} else if (SAVE_AS.equals(actionEvent.getActionCommand())) {
 			try {
 				JFileChooser fileChooser = new JFileChooser();
@@ -227,23 +243,6 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 		}
 	}
 
-	public void valueChanged(TreeSelectionEvent e) {
-		if (!ScenarioPlayer.isPlaying() && !ScenarioPlayer.isPaused()) {
-			TreePath selectionPath = e.getNewLeadSelectionPath();
-			if (selectionPath != null) {
-				Object lastPathComponent = selectionPath.getLastPathComponent();
-				if (lastPathComponent != null) {
-					if (lastPathComponent instanceof DefaultMutableTreeNode)
-						if (((DefaultMutableTreeNode) lastPathComponent).getUserObject() instanceof Scene) {
-							playButton.setEnabled(true);
-						} else {
-							playButton.setEnabled(false);
-						}
-				}
-			}
-		}
-	}
-
 	public void stateChanged(StateChangedEvent e) {
 		if (e.getNewState().equals(State.STOP)) {
 			playButton.setEnabled(scenarioViewer.getSelectedObject() instanceof Scene);
@@ -254,6 +253,21 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 			statusLabel.setText("Playing");
 		} else if (e.getNewState().equals(State.PAUSE)) {
 			statusLabel.setText("Paused");
+		} else if (e.getNewState().equals(State.MANUAL_ACKNOWLEDGE)) {
+			statusLabel.setText(e.getMessage());
+		} 
+	}
+	
+	private void populateSelectedSceneForPlayerComboBox() {
+		selectedSceneForPlayerComboBox.removeAllItems();
+		Scenario scenario = scenarioViewer.getScenario();
+		if (scenario != null) {
+			List<Scene> scenes = scenario.getScenes();
+			playButton.setEnabled(scenes.size() > 0);
+			for (Iterator<Scene> iterator = scenes.iterator(); iterator.hasNext();) {
+				Scene scene = iterator.next();
+				selectedSceneForPlayerComboBox.addItem(scene);
+			}
 		}
 	}
 }
