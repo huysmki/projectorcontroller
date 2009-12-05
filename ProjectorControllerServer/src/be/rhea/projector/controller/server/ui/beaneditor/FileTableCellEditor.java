@@ -17,8 +17,10 @@ import javax.swing.table.TableCellEditor;
 public class FileTableCellEditor extends AbstractCellEditor implements
 		TableCellEditor, ActionListener {
 	private static final long serialVersionUID = 1L;
+	private static JFileChooser fileChooser = new JFileChooser();
 	private String fileName;
 	private JTextField textField;
+	
 
 	public FileTableCellEditor(String fileName) {
 		this.fileName = fileName;
@@ -44,7 +46,6 @@ public class FileTableCellEditor extends AbstractCellEditor implements
 	}
 
 	public void actionPerformed(ActionEvent actionevent) {
-		JFileChooser fileChooser = new JFileChooser();
 		if (fileChooser.showDialog(null, "Select")== JFileChooser.APPROVE_OPTION) {
 			fileName = fileChooser.getSelectedFile().getName();
 			textField.setText(fileName);

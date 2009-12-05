@@ -210,6 +210,9 @@ public class AnnotationPropertyTableData extends AbstractTableModel  {
 			} else if (propertyData.getType() == Type.CLIENTS) {
 				ClientsTableCellRenderer clientTableCellRenderer = new ClientsTableCellRenderer(Integer.parseInt((String) getValueAt(row, column)), clients);
 				return clientTableCellRenderer;
+			} else if (propertyData.getType() == Type.BOOLEAN) {
+				BooleanTableCellRenderer booleanTableCellRenderer = new BooleanTableCellRenderer(Boolean.parseBoolean((String) getValueAt(row, column)));
+				return booleanTableCellRenderer;
 			} 
 		}
 		return null;
@@ -230,6 +233,8 @@ public class AnnotationPropertyTableData extends AbstractTableModel  {
 				return (TableCellEditor) new IPTableCellEditor(valueAt);
 			} else if (propertyData.getType() == Type.ARTNET) {
 				return (TableCellEditor) new ArtNetTableCellEditor(((ArrayList<Integer>) stringToObj(valueAt, List.class)));
+			} else if (propertyData.getType() == Type.BOOLEAN) {
+				return (TableCellEditor) new BooleanTableCellEditor(Boolean.parseBoolean((String) getValueAt(row, column)));
 			}
 		}
 		return null;

@@ -1,7 +1,5 @@
 package be.rhea.projector.controller.client;
 
-// Fig. 21.7: MediaTest.java
-// A simple media player
 import java.awt.Color;
 import java.io.IOException;
 import java.util.Collections;
@@ -11,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import be.rhea.projector.controller.client.listener.FrameMouseListener;
 import be.rhea.projector.controller.client.ui.ColorPanel;
@@ -33,7 +32,15 @@ import be.rhea.remote.server.SimpleProtocolUDPWithRetryServer;
 public class ProjectorControllerClient {
 	public static void main(String args[]) throws IOException {
 
+		if (args.length < 2) {
+			JOptionPane.showMessageDialog(null, "Usage : java -jar ProjectorClient.jar <listenPort> <mediaDir>");
+			System.exit(1);
+		}
         int port = Integer.valueOf(args[0]);
+        String mediaDir = args[1];
+        if (!mediaDir.endsWith("/")) {
+        	mediaDir += "/";
+        }
  
 		JFrame frame = new JFrame("Media Tester");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -52,15 +59,15 @@ public class ProjectorControllerClient {
 		Map<String, SimpleProtocolServerCommand> commandMap = new HashMap<String, SimpleProtocolServerCommand>();
 		
 		PCPMediaTarFileTransferServerCommand mediaTarFileTransferServerCommand = new PCPMediaTarFileTransferServerCommand();
-		mediaTarFileTransferServerCommand.setMediaDir("c:/temp/" + port);
+		mediaTarFileTransferServerCommand.setMediaDir(mediaDir);
 		commandMap.put(PCP.PROTOCOL + ":" + PCP.UPLOAD_MEDIA, mediaTarFileTransferServerCommand);
 		
 		PCPVideoMediaStartServerCommand videoMediaStartServerCommand = new PCPVideoMediaStartServerCommand(frame, mediaPanelMap);
-		videoMediaStartServerCommand.setMediaDir("c:/temp/" + port);
+		videoMediaStartServerCommand.setMediaDir(mediaDir);
 		commandMap.put(PCP.PROTOCOL + ":" + PCP.START_VIDEO_MEDIA, videoMediaStartServerCommand);
 		
 		PCPVideoMediaPreloadServerCommand videoMediaPreloadServerCommand = new PCPVideoMediaPreloadServerCommand(mediaPanelMap);
-		videoMediaPreloadServerCommand.setMediaDir("c:/temp/" + port);
+		videoMediaPreloadServerCommand.setMediaDir(mediaDir);
 		commandMap.put(PCP.PROTOCOL + ":" + PCP.PRELOAD_VIDEO_MEDIA, videoMediaPreloadServerCommand);
 
 		PCPColorServerCommand colorLoadServerCommand = new PCPColorServerCommand(frame, colorPanel);
@@ -70,7 +77,7 @@ public class ProjectorControllerClient {
 		commandMap.put(PCP.PROTOCOL + ":" + PCP.START_TRANSITION_COLOR, transitionColorLoadServerCommand);
 
 		PCPImageLoadServerCommand imageLoadServerCommand = new PCPImageLoadServerCommand(imagePanel);
-		imageLoadServerCommand.setMediaDir("c:/temp/" + port);
+		imageLoadServerCommand.setMediaDir(mediaDir);
 		commandMap.put(PCP.PROTOCOL + ":" + PCP.LOAD_IMAGE, imageLoadServerCommand);
 
 		PCPImagePlayServerCommand imagePlayServerCommand = new PCPImagePlayServerCommand(frame, imagePanel);
