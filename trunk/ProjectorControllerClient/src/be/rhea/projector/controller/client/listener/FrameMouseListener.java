@@ -15,7 +15,6 @@ public class FrameMouseListener extends MouseAdapter implements MouseMotionListe
 
 	public FrameMouseListener(JFrame frame) {
 		this.frame = frame;
-		// TODO Auto-generated constructor stub
 	}
 
 	public void mouseDragged(MouseEvent event) {

@@ -3,6 +3,7 @@ package be.rhea.projector.controller.client.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.net.URL;
 
 import javax.media.CachingControl;
@@ -55,14 +56,15 @@ public class VideoMediaPanel extends JPanel implements ControllerListener{
 		
 	} 
 
-	public void play() {
+	public void play(Dimension size, boolean loop) {
 		killCurrentView ();
         Component compControl = mediaPlayer.getVisualComponent();
+        mediaPlayer.setSize(size);
         if ( compControl != null) {
             this.add ( compControl);
             compControl.setVisible(true);
         }
-
+        mediaPlayer.setPlaybackLoop(loop);
         mediaPlayer.start();
         this.repaint();
         this.revalidate();

@@ -44,7 +44,7 @@ public class ImagePanel extends JPanel implements Runnable {
 			revalidate();
 		} else {
 			alpha = 0f;
-			sleepTime = fadeInTime / 30;
+			sleepTime = fadeInTime / 40;
 			fadeIn = true;
 			startFadeThread();
 		}
@@ -63,7 +63,15 @@ public class ImagePanel extends JPanel implements Runnable {
 	public void paint(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
 		g2d.setComposite(makeComposite(alpha));
-        g2d.drawImage(currentImage, 0, 0, this.getWidth(), this.getHeight(), null);
+		g2d.setBackground(Color.BLACK);
+		g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
+		float widthRatio = (float)currentImage.getWidth(null) / (float)this.getWidth();
+		float heightRatio = (float)currentImage.getHeight(null) / (float)this.getHeight();
+		int imageWidth = (int)((float) currentImage.getWidth(null) / (widthRatio < heightRatio?heightRatio:widthRatio));
+		int imageHeight = (int)((float) currentImage.getHeight(null) / (widthRatio < heightRatio?heightRatio:widthRatio));
+		int x = (this.getWidth() - imageWidth) / 2;
+		int y = (this.getHeight() - imageHeight) / 2;
+        g2d.drawImage(currentImage, x, y, imageWidth, imageHeight, null);
 	}
 
 	public void run() {
@@ -71,7 +79,11 @@ public class ImagePanel extends JPanel implements Runnable {
 			while (alpha < 1 && running ) {
 				repaint();
 				revalidate();
-				alpha += .01f;
+				if (alpha < .05f) {
+					alpha += .01f;
+				} else {
+					alpha += .05f;
+				}
 				if (alpha > 1) {
 					alpha = 1;
 				}
@@ -85,7 +97,11 @@ public class ImagePanel extends JPanel implements Runnable {
 			while (alpha > 0 && running ) {
 				repaint();
 				revalidate();
-				alpha -= .01f;
+				if (alpha < .05f) {
+					alpha -= .01f;
+				} else {
+					alpha -= .05f;
+				}
 				if (alpha < 0) {
 					alpha = 0;
 				}

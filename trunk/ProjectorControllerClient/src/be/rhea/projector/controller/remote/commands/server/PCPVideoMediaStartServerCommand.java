@@ -26,11 +26,13 @@ public class PCPVideoMediaStartServerCommand implements
 	public String execute(String[] parameters) {
 		try {
 			String videoFileName = parameters[0];
+			boolean loop = Boolean.parseBoolean(parameters[1]);
 	
 			VideoMediaPanel videoMediaPanel = mediaPanelMap.get(videoFileName);
 			
 			if (videoMediaPanel == null) {
 				videoMediaPanel = new VideoMediaPanel();
+				mediaPanelMap.put(videoFileName, videoMediaPanel);
 				URL url = new File(mediaDir + "/" + parameters[0]).toURI().toURL();
 				videoMediaPanel.realize(url);
 			}
@@ -42,7 +44,7 @@ public class PCPVideoMediaStartServerCommand implements
 			
 			frame.getContentPane().removeAll();
 			frame.getContentPane().add(videoMediaPanel);
-			videoMediaPanel.play();
+			videoMediaPanel.play(frame.getSize(), loop);
 			
 		} catch (MalformedURLException e) {
 			e.printStackTrace();

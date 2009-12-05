@@ -51,6 +51,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 	private static final String NEW_SCENARIO = "NEW_SCENARIO";
 	private static final String EXIT = "EXIT";
 	private static final String REFRESH_SCENES = "REFRESH_SCENES";
+	private static JFileChooser fileChooser = new JFileChooser();
 	private ScenarioViewer scenarioViewer;
 	private File selectedFile;
 	private JButton playButton;
@@ -174,7 +175,6 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 		} else if (EXIT.equals(actionEvent.getActionCommand())) {
 			System.exit(0);
 		} else if (OPEN.equals(actionEvent.getActionCommand())) {
-			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.setFileFilter(new XMLFileFilter());
 			fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
 			if (fileChooser.showDialog(this, "Select") == JFileChooser.APPROVE_OPTION) {
@@ -212,7 +212,6 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 				populateSelectedSceneForPlayerComboBox();
 		} else if (SAVE_AS.equals(actionEvent.getActionCommand())) {
 			try {
-				JFileChooser fileChooser = new JFileChooser();
 				fileChooser.setFileFilter(new XMLFileFilter());
 				fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
 				if (fileChooser.showDialog(this, "Save") == JFileChooser.APPROVE_OPTION) {
@@ -245,7 +244,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 
 	public void stateChanged(StateChangedEvent e) {
 		if (e.getNewState().equals(State.STOP)) {
-			playButton.setEnabled(scenarioViewer.getSelectedObject() instanceof Scene);
+			playButton.setEnabled(true);
 			pauseButton.setEnabled(false);
 			stopButton.setEnabled(false);
 			statusLabel.setText("");
@@ -254,7 +253,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 		} else if (e.getNewState().equals(State.PAUSE)) {
 			statusLabel.setText("Paused");
 		} else if (e.getNewState().equals(State.MANUAL_ACKNOWLEDGE)) {
-			statusLabel.setText(e.getMessage());
+			statusLabel.setText("Pause : " + e.getMessage());
 		} 
 	}
 	
