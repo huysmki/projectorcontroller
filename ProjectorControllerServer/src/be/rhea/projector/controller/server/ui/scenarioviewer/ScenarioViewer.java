@@ -1,4 +1,4 @@
-package be.rhea.projector.controller.server.ui;
+package be.rhea.projector.controller.server.ui.scenarioviewer;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

@@ -1,8 +1,6 @@
 package be.rhea.projector.controller.server;
 
-import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.XMLDecoder;
@@ -12,53 +10,35 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.util.Iterator;
-import java.util.List;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
+import javax.swing.ButtonGroup;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JToolBar;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import be.rhea.projector.controller.server.filefilter.XMLFileFilter;
-import be.rhea.projector.controller.server.player.ScenarioPlayer;
-import be.rhea.projector.controller.server.player.StateChangedEvent;
-import be.rhea.projector.controller.server.player.StateChangedListener;
-import be.rhea.projector.controller.server.player.StateChangedEvent.State;
 import be.rhea.projector.controller.server.scenario.Scenario;
-import be.rhea.projector.controller.server.scenario.Scene;
-import be.rhea.projector.controller.server.ui.ScenarioViewer;
-import be.rhea.projector.controller.server.ui.beaneditor.BeanEditor;
+import be.rhea.projector.controller.server.ui.EditPanel;
+import be.rhea.projector.controller.server.ui.PlayerPanel;
 
-public class ProjectorControllerServer extends JFrame implements ActionListener, StateChangedListener {
+public class ProjectorControllerServer extends JFrame implements ActionListener {
+	private static final String PLAYER_MODE = "PLAYER_MODE";
+	private static final String EDITOR_MODE = "EDITOR_MODE";
 	private static final String TITLE = "Projector Controller";
 	private static final long serialVersionUID = 1L;
 	private static final String OPEN = "OPEN";
 	private static final String SAVE = "SAVE";
 	private static final String SAVE_AS = "SAVE_AS";
-	private static final String PLAY_SCENE = "PLAY_SCENE";
-	private static final String PAUSE_SCENE = "PAUSE_SCENE";
-	private static final String STOP_SCENE = "STOP_SCENE";
 	private static final String NEW_SCENARIO = "NEW_SCENARIO";
 	private static final String EXIT = "EXIT";
-	private static final String REFRESH_SCENES = "REFRESH_SCENES";
-	private static JFileChooser fileChooser = new JFileChooser();
-	private ScenarioViewer scenarioViewer;
+	private static JFileChooser fileChooser;
 	private File selectedFile;
-	private JButton playButton;
-	private JButton pauseButton;
-	private JButton stopButton;
-	private JLabel statusLabel;
-	private JComboBox selectedSceneForPlayerComboBox;
+	private EditPanel editPanel;
 
 	public static void main(String[] args) throws Exception {
 		ProjectorControllerServer server = new ProjectorControllerServer();
@@ -66,77 +46,26 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 	}
 
 	private void start() {
+		try {
+			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+			SwingUtilities.updateComponentTreeUI(this);		
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		fileChooser = new JFileChooser();
 		this.setTitle(TITLE);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		createMenu();
-		JPanel panel = new JPanel();
-		panel.setLayout(new BorderLayout());
-		JToolBar toolbar = createToolBar();
-		toolbar.setFloatable(true);
-		toolbar.setRollover(true);
-		panel.setLayout(new BorderLayout());
-		panel.add(toolbar, BorderLayout.PAGE_END);
-		JSplitPane splitpane = new JSplitPane();
-		panel.add(splitpane, BorderLayout.CENTER);
-		BeanEditor beanEditor = new BeanEditor();
-		splitpane.setRightComponent(beanEditor);
-		JScrollPane scrollPane = new JScrollPane();
-		scenarioViewer = new ScenarioViewer(beanEditor);
-		scenarioViewer.setSize(600, 300);
-		scrollPane.getViewport().add(scenarioViewer);
-		splitpane.setLeftComponent(scrollPane);
-		splitpane.setDividerLocation(400);
-		splitpane.setResizeWeight(1);
-		scenarioViewer.setModel(null);
-		Container contentPane = this.getContentPane();
-		contentPane.add(panel);
 		
-		ScenarioPlayer.addStateChangeListener(this);
+		Container contentPane = this.getContentPane();
+		editPanel = new EditPanel();
+		contentPane.add(editPanel);
 
 		this.setSize(800, 600);
 		this.setVisible(true);
 	}
 
-	private JToolBar createToolBar() {
-		ImageIcon playIcon = new ImageIcon(this.getClass().getResource("/play.png"));
-		ImageIcon refreshIcon = new ImageIcon(this.getClass().getResource("/refresh.png"));
-		ImageIcon pauseIcon = new ImageIcon(this.getClass().getResource("/pause.png"));
-		ImageIcon stopIcon = new ImageIcon(this.getClass().getResource("/stop.png"));
-		JToolBar toolbar = new JToolBar();
-		JButton refreshButton = new JButton();
-		refreshButton.setIcon(refreshIcon);
-		refreshButton.setActionCommand(REFRESH_SCENES);
-		refreshButton.addActionListener(this);
-		playButton = new JButton();
-		playButton.setIcon(playIcon);
-		playButton.setActionCommand(PLAY_SCENE);
-		playButton.addActionListener(this);
-		playButton.setEnabled(false);
-		pauseButton = new JButton();
-		pauseButton.setIcon(pauseIcon);
-		pauseButton.setActionCommand(PAUSE_SCENE);
-		pauseButton.addActionListener(this);
-		pauseButton.setEnabled(false);
-		stopButton = new JButton();
-		stopButton.setIcon(stopIcon);
-		stopButton.setActionCommand(STOP_SCENE);
-		stopButton.addActionListener(this);
-		stopButton.setEnabled(false);
-		toolbar.add(new JLabel("Scene : "));
-		selectedSceneForPlayerComboBox = new JComboBox();
-		selectedSceneForPlayerComboBox.setMaximumSize(new Dimension(200,25));
-		toolbar.add(selectedSceneForPlayerComboBox);
-		toolbar.add(refreshButton);
-		toolbar.addSeparator(new Dimension(10,10));
-		toolbar.add(playButton);
-		toolbar.add(pauseButton);
-		toolbar.addSeparator(new Dimension(10,10));
-		toolbar.add(stopButton);
-		toolbar.addSeparator(new Dimension(10,10));
-		statusLabel = new JLabel("");
-		toolbar.add(statusLabel);
-		return toolbar;
-	}
 
 	private void createMenu() {
 		JMenuBar menuBar = new JMenuBar();
@@ -165,12 +94,27 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 		save.addActionListener(this);
 		saveAs.addActionListener(this);
 		exit.addActionListener(this);
+		JMenu modeMenu = new JMenu("Mode");
+		ButtonGroup group = new ButtonGroup();
+		JRadioButtonMenuItem editModeMenu = new JRadioButtonMenuItem("Editor");
+		group.add(editModeMenu);
+		editModeMenu.setSelected(true);
+		editModeMenu.setActionCommand(EDITOR_MODE);
+		editModeMenu.addActionListener(this);
+		JRadioButtonMenuItem playerModeMenu = new JRadioButtonMenuItem("Player");
+		group.add(playerModeMenu);
+		playerModeMenu.setActionCommand(PLAYER_MODE);
+		playerModeMenu.addActionListener(this);
+		modeMenu.add(editModeMenu);
+		modeMenu.add(playerModeMenu);
+		menuBar.add(modeMenu);
+		
 	}
 
 	public void actionPerformed(ActionEvent actionEvent) {
-		Scenario currentScenario = scenarioViewer.getScenario();
+		Scenario currentScenario = editPanel.getScenario();
 		if (NEW_SCENARIO.equals(actionEvent.getActionCommand())) {
-			scenarioViewer.setScenario(new Scenario());
+			editPanel.setScenario(new Scenario());
 			this.setTitle(TITLE + " " + "NewScenario");
 		} else if (EXIT.equals(actionEvent.getActionCommand())) {
 			System.exit(0);
@@ -184,39 +128,20 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 							selectedFile));
 					currentScenario = (Scenario) decoder.readObject();
 					decoder.close();
-					scenarioViewer.setScenario(currentScenario);
+					editPanel.setScenario(currentScenario);
 					this.setTitle(TITLE + " " + selectedFile);
-					populateSelectedSceneForPlayerComboBox();
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-		} else if (PLAY_SCENE.equals(actionEvent.getActionCommand())) {
-				int indexOf = selectedSceneForPlayerComboBox.getSelectedIndex();
-				if (indexOf >= 0) {
-					ScenarioPlayer.setScenario(currentScenario);
-					ScenarioPlayer.play(indexOf);
-					playButton.setEnabled(false);
-					pauseButton.setEnabled(true);
-					stopButton.setEnabled(true);
-				}
-		} else if (PAUSE_SCENE.equals(actionEvent.getActionCommand())) {
-				ScenarioPlayer.pause();
-		} else if (STOP_SCENE.equals(actionEvent.getActionCommand())) {
-				ScenarioPlayer.stop();
-				playButton.setEnabled(true);
-				pauseButton.setEnabled(false);
-				stopButton.setEnabled(false);				
-		} else if (REFRESH_SCENES.equals(actionEvent.getActionCommand())) {
-				populateSelectedSceneForPlayerComboBox();
 		} else if (SAVE_AS.equals(actionEvent.getActionCommand())) {
 			try {
 				fileChooser.setFileFilter(new XMLFileFilter());
 				fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
 				if (fileChooser.showDialog(this, "Save") == JFileChooser.APPROVE_OPTION) {
 					selectedFile = fileChooser.getSelectedFile();
-					Scenario scenario = scenarioViewer.getScenario();
+					Scenario scenario = editPanel.getScenario();
 					XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(
 							new FileOutputStream(selectedFile)));
 					encoder.writeObject(scenario);
@@ -229,7 +154,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 			}
 		} else if (SAVE.equals(actionEvent.getActionCommand())) {
 			try {
-				Scenario scenario = scenarioViewer.getScenario();
+				Scenario scenario = editPanel.getScenario();
 				XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(
 						new FileOutputStream(selectedFile)));
 				encoder.writeObject(scenario);
@@ -239,34 +164,15 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		} else if (EDITOR_MODE.equals(actionEvent.getActionCommand())) {
+			this.getContentPane().removeAll();
+			this.getContentPane().add(editPanel);
+			SwingUtilities.updateComponentTreeUI(this);
+		} else if (PLAYER_MODE.equals(actionEvent.getActionCommand())) {
+			this.getContentPane().removeAll();
+			this.getContentPane().add(new PlayerPanel(editPanel.getScenario()));
+			SwingUtilities.updateComponentTreeUI(this);
 		}
 	}
 
-	public void stateChanged(StateChangedEvent e) {
-		if (e.getNewState().equals(State.STOP)) {
-			playButton.setEnabled(true);
-			pauseButton.setEnabled(false);
-			stopButton.setEnabled(false);
-			statusLabel.setText("");
-		} else if (e.getNewState().equals(State.PLAY)) {
-			statusLabel.setText("Playing");
-		} else if (e.getNewState().equals(State.PAUSE)) {
-			statusLabel.setText("Paused");
-		} else if (e.getNewState().equals(State.MANUAL_ACKNOWLEDGE)) {
-			statusLabel.setText("Pause : " + e.getMessage());
-		} 
-	}
-	
-	private void populateSelectedSceneForPlayerComboBox() {
-		selectedSceneForPlayerComboBox.removeAllItems();
-		Scenario scenario = scenarioViewer.getScenario();
-		if (scenario != null) {
-			List<Scene> scenes = scenario.getScenes();
-			playButton.setEnabled(scenes.size() > 0);
-			for (Iterator<Scene> iterator = scenes.iterator(); iterator.hasNext();) {
-				Scene scene = iterator.next();
-				selectedSceneForPlayerComboBox.addItem(scene);
-			}
-		}
-	}
 }
