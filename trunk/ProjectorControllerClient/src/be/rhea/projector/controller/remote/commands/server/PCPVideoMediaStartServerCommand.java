@@ -5,7 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
-import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import be.rhea.projector.controller.client.ui.VideoMediaPanel;
 import be.rhea.remote.server.SimpleProtocolServerExecuteCommand;
@@ -16,10 +16,10 @@ public class PCPVideoMediaStartServerCommand implements
 	private static final int MAX_WAIT_TIME_MILLIS = 3000;
 	private final Map<String, VideoMediaPanel> mediaPanelMap;
 	private String mediaDir;
-	private final JFrame frame;
+	private final JPanel panel;
 
-	public PCPVideoMediaStartServerCommand(JFrame frame, Map<String, VideoMediaPanel> mediaPanelMap) {
-		this.frame = frame;
+	public PCPVideoMediaStartServerCommand(JPanel panel, Map<String, VideoMediaPanel> mediaPanelMap) {
+		this.panel = panel;
 		this.mediaPanelMap = mediaPanelMap;
 	}
 
@@ -42,9 +42,9 @@ public class PCPVideoMediaStartServerCommand implements
 				Thread.sleep(1);
 			}
 			
-			frame.getContentPane().removeAll();
-			frame.getContentPane().add(videoMediaPanel);
-			videoMediaPanel.play(frame.getSize(), loop);
+			panel.removeAll();
+			panel.add(videoMediaPanel);
+			videoMediaPanel.play(panel.getSize(), loop);
 			
 		} catch (MalformedURLException e) {
 			e.printStackTrace();

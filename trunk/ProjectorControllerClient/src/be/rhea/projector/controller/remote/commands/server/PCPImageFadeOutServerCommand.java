@@ -1,6 +1,6 @@
 package be.rhea.projector.controller.remote.commands.server;
 
-import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import be.rhea.projector.controller.client.ui.ImagePanel;
 import be.rhea.remote.server.SimpleProtocolServerExecuteCommand;
@@ -10,7 +10,7 @@ public class PCPImageFadeOutServerCommand implements
 	
 	private final ImagePanel mediaPanel;
 
-	public PCPImageFadeOutServerCommand(JFrame frame, ImagePanel imagePanel) {
+	public PCPImageFadeOutServerCommand(JPanel panel, ImagePanel imagePanel) {
 		this.mediaPanel = imagePanel;
 	}
 

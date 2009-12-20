@@ -2,7 +2,7 @@ package be.rhea.projector.controller.remote.commands.server;
 
 import java.awt.Color;
 
-import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import be.rhea.projector.controller.client.ui.ColorPanel;
 import be.rhea.remote.server.SimpleProtocolServerExecuteCommand;
@@ -11,7 +11,7 @@ public class PCPTransitionColorServerCommand implements
 		SimpleProtocolServerExecuteCommand, Runnable {
 	
 	private final ColorPanel mediaPanel;
-	private final JFrame frame;
+	private final JPanel panel;
 	private int fromR;
 	private int fromG;
 	private int fromB;
@@ -20,14 +20,14 @@ public class PCPTransitionColorServerCommand implements
 	private int toB;
 	private int time;
 
-	public PCPTransitionColorServerCommand(JFrame frame, ColorPanel colorPanel) {
-		this.frame = frame;
+	public PCPTransitionColorServerCommand(JPanel panel, ColorPanel colorPanel) {
+		this.panel = panel;
 		this.mediaPanel = colorPanel;
 	}
 
 	public String execute(String[] parameters) {
-		frame.getContentPane().removeAll();
-		frame.getContentPane().add(mediaPanel);
+		panel.removeAll();
+		panel.add(mediaPanel);
 		
 		fromR = Integer.valueOf(parameters[0]);
 		fromG = Integer.valueOf(parameters[1]);
