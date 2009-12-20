@@ -2,7 +2,7 @@ package be.rhea.projector.controller.remote.commands.server;
 
 import java.util.Map;
 
-import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import be.rhea.projector.controller.client.ui.VideoMediaPanel;
 import be.rhea.remote.server.SimpleProtocolServerExecuteCommand;
@@ -11,16 +11,16 @@ public class PCPVideoMediaStopServerCommand implements
 		SimpleProtocolServerExecuteCommand {
 	
 	private final Map<String, VideoMediaPanel> mediaPanelMap;
-	private final JFrame frame;
+	private final JPanel panel;
 
-	public PCPVideoMediaStopServerCommand(JFrame frame, Map<String,VideoMediaPanel> mediaPanelMap) {
-		this.frame = frame;
+	public PCPVideoMediaStopServerCommand(JPanel panel, Map<String,VideoMediaPanel> mediaPanelMap) {
+		this.panel = panel;
 		this.mediaPanelMap = mediaPanelMap;
 	}
 
 	public String execute(String[] parameters) {
 		String videoFileName = parameters[0];
-		frame.getContentPane().removeAll();
+		panel.removeAll();
 		
 		VideoMediaPanel videoMediaPanel = mediaPanelMap.get(videoFileName);
 		if (videoMediaPanel != null) {
