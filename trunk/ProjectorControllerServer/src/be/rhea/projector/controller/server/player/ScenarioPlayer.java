@@ -139,6 +139,9 @@ public class ScenarioPlayer implements Runnable {
 							e.printStackTrace();
 							return;
 						}
+						if (!isPlaying) {
+							return;
+						}						
 					}
 					String command = action.getCommand();
 					if (action instanceof SleepAction) {

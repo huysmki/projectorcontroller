@@ -39,6 +39,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener 
 	private static JFileChooser fileChooser;
 	private File selectedFile;
 	private EditPanel editPanel;
+	private PlayerPanel playerPanel;
 
 	public static void main(String[] args) throws Exception {
 		ProjectorControllerServer server = new ProjectorControllerServer();
@@ -165,12 +166,17 @@ public class ProjectorControllerServer extends JFrame implements ActionListener 
 				e.printStackTrace();
 			}
 		} else if (EDITOR_MODE.equals(actionEvent.getActionCommand())) {
+			if (playerPanel != null) {
+				playerPanel.stopMediaPanels();
+				playerPanel = null;
+			}
 			this.getContentPane().removeAll();
 			this.getContentPane().add(editPanel);
 			SwingUtilities.updateComponentTreeUI(this);
 		} else if (PLAYER_MODE.equals(actionEvent.getActionCommand())) {
 			this.getContentPane().removeAll();
-			this.getContentPane().add(new PlayerPanel(editPanel.getScenario()));
+			playerPanel = new PlayerPanel(editPanel.getScenario());
+			this.getContentPane().add(playerPanel);
 			SwingUtilities.updateComponentTreeUI(this);
 		}
 	}
