@@ -28,6 +28,7 @@ import be.rhea.remote.server.SimpleProtocolUDPWithRetryServer;
 public class ClientPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
+	private SimpleProtocolServer server;
 	
 	public ClientPanel(String mediaDir, int port) throws IOException {
 		this.setBackground(Color.BLACK);
@@ -71,15 +72,28 @@ public class ClientPanel extends JPanel {
 		PCPVideoMediaStopServerCommand videoMediaStopServerCommand = new PCPVideoMediaStopServerCommand(this, mediaPanelMap);
 		commandMap.put(PCP.PROTOCOL + ":" + PCP.STOP_VIDEO_MEDIA, videoMediaStopServerCommand);
 	
-	//	SimpleProtocolServer server = new SimpleProtocolTCPServer(port, PCP.PROTOCOL);
-	//	SimpleProtocolServer server = new SimpleProtocolUDPServer(port, PCP.PROTOCOL);
-		SimpleProtocolServer server = new SimpleProtocolUDPWithRetryServer(port, PCP.PROTOCOL);
+		server = new SimpleProtocolUDPWithRetryServer(port, PCP.PROTOCOL);
 		server.setCommandMap(commandMap);
 	    Logger logger = Logger.getLogger("be.rhea.remote.server.SimpleProtocolServer");
 	    logger.setLevel(Level.ALL);
 	    logger.log(Level.INFO, "Client started");
 		server.setLogger(logger);
-	    server.start();
 	}
+	
+	public void startListening() {
+	    try {
+			server.start();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void stopListening() {
+	    try {
+			server.stop();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}	
 
 }
