@@ -65,13 +65,15 @@ public class ImagePanel extends JPanel implements Runnable {
 		g2d.setComposite(makeComposite(alpha));
 		g2d.setBackground(Color.BLACK);
 		g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
-		float widthRatio = (float)currentImage.getWidth(null) / (float)this.getWidth();
-		float heightRatio = (float)currentImage.getHeight(null) / (float)this.getHeight();
-		int imageWidth = (int)((float) currentImage.getWidth(null) / (widthRatio < heightRatio?heightRatio:widthRatio));
-		int imageHeight = (int)((float) currentImage.getHeight(null) / (widthRatio < heightRatio?heightRatio:widthRatio));
-		int x = (this.getWidth() - imageWidth) / 2;
-		int y = (this.getHeight() - imageHeight) / 2;
-        g2d.drawImage(currentImage, x, y, imageWidth, imageHeight, null);
+		if (currentImage != null) {
+			float widthRatio = (float)currentImage.getWidth(null) / (float)this.getWidth();
+			float heightRatio = (float)currentImage.getHeight(null) / (float)this.getHeight();
+			int imageWidth = (int)((float) currentImage.getWidth(null) / (widthRatio < heightRatio?heightRatio:widthRatio));
+			int imageHeight = (int)((float) currentImage.getHeight(null) / (widthRatio < heightRatio?heightRatio:widthRatio));
+			int x = (this.getWidth() - imageWidth) / 2;
+			int y = (this.getHeight() - imageHeight) / 2;
+	        g2d.drawImage(currentImage, x, y, imageWidth, imageHeight, null);
+		} 
 	}
 
 	public void run() {

@@ -16,6 +16,7 @@ import be.rhea.projector.controller.remote.commands.server.PCPImageFadeOutServer
 import be.rhea.projector.controller.remote.commands.server.PCPImageLoadServerCommand;
 import be.rhea.projector.controller.remote.commands.server.PCPImagePlayServerCommand;
 import be.rhea.projector.controller.remote.commands.server.PCPMediaTarFileTransferServerCommand;
+import be.rhea.projector.controller.remote.commands.server.PCPStopServerCommand;
 import be.rhea.projector.controller.remote.commands.server.PCPTransitionColorServerCommand;
 import be.rhea.projector.controller.remote.commands.server.PCPVideoMediaPreloadServerCommand;
 import be.rhea.projector.controller.remote.commands.server.PCPVideoMediaStartServerCommand;
@@ -25,12 +26,36 @@ import be.rhea.remote.server.SimpleProtocolServer;
 import be.rhea.remote.server.SimpleProtocolServerCommand;
 import be.rhea.remote.server.SimpleProtocolUDPWithRetryServer;
 
-public class ClientPanel extends JPanel {
+public class ClientPanel extends JPanel{
 
 	private static final long serialVersionUID = 1L;
 	private SimpleProtocolServer server;
+	private final String mediaDir;
+	private final int port;
 	
 	public ClientPanel(String mediaDir, int port) throws IOException {
+		this.mediaDir = mediaDir;
+		this.port = port;
+		initialize();
+	}
+	
+	private void startListening() {
+	    try {
+			server.start();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void stopListening() {
+	    try {
+			server.stop();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void initialize() {
 		this.setBackground(Color.BLACK);
 		this.setLayout(new BorderLayout());
 		
@@ -71,29 +96,18 @@ public class ClientPanel extends JPanel {
 	
 		PCPVideoMediaStopServerCommand videoMediaStopServerCommand = new PCPVideoMediaStopServerCommand(this, mediaPanelMap);
 		commandMap.put(PCP.PROTOCOL + ":" + PCP.STOP_VIDEO_MEDIA, videoMediaStopServerCommand);
+		
+		PCPStopServerCommand stopServerCommand = new PCPStopServerCommand(this, mediaPanelMap);
+		commandMap.put(PCP.PROTOCOL + ":" + PCP.STOP, stopServerCommand);
 	
 		server = new SimpleProtocolUDPWithRetryServer(port, PCP.PROTOCOL);
 		server.setCommandMap(commandMap);
 	    Logger logger = Logger.getLogger("be.rhea.remote.server.SimpleProtocolServer");
 	    logger.setLevel(Level.ALL);
 	    logger.log(Level.INFO, "Client started");
-		server.setLogger(logger);
-	}
-	
-	public void startListening() {
-	    try {
-			server.start();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void stopListening() {
-	    try {
-			server.stop();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		server.setLogger(logger);		
+		
+		startListening();
 	}	
 
 }

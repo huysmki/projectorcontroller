@@ -75,6 +75,7 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 		stopPausePanel.add(Box.createHorizontalGlue());
 		
 		pauseButton = new JButton(new ImageIcon(this.getClass().getResource("/pause.png")));
+		pauseButton.setFocusable(false);
 		pauseButton.setActionCommand(PAUSE);
 		pauseButton.addActionListener(this);
 		pauseButton.setPreferredSize(new Dimension(150,150));
@@ -85,6 +86,7 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 		stopPausePanel.add(Box.createRigidArea(new Dimension(40,0)));
 
 		stopButton = new JButton(new ImageIcon(this.getClass().getResource("/stop.png")));
+		stopButton.setFocusable(false);
 		stopButton.setActionCommand(STOP);
 		stopButton.addActionListener(this);
 		stopButton.setPreferredSize(new Dimension(150,150));
@@ -124,7 +126,6 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 				clientPanel.setPreferredSize(new Dimension(200,150));
 				clientPanel.setMinimumSize(new Dimension(200,150));
 				clientPanel.setMaximumSize(new Dimension(200,150));
-				clientPanel.startListening();
 				clientPanel.setAlignmentX(CENTER_ALIGNMENT);
 				overviewClientsPanel.add(clientPanel);
 				clientPanels.add(clientPanel);
@@ -155,6 +156,7 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 		playPanel.add(label);
 		playPanel.add(Box.createHorizontalGlue());
 		JButton playButton = new JButton(new ImageIcon(this.getClass().getResource("/play.png")));
+		playButton.setFocusable(false);
 		playButton.setActionCommand(PLAY + index);
 		playButton.addActionListener(this);
 		

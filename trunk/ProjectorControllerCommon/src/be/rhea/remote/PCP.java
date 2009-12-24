@@ -21,4 +21,6 @@ public class PCP {
 	
 	public static final String FADE_OUT_IMAGE = "FADE_OUT_IMAGE";
 
+	public static final String STOP = "STOP";
+
 }
