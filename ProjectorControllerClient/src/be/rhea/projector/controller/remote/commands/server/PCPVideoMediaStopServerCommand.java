@@ -24,12 +24,12 @@ public class PCPVideoMediaStopServerCommand implements
 		
 		VideoMediaPanel videoMediaPanel = mediaPanelMap.get(videoFileName);
 		if (videoMediaPanel != null) {
+			mediaPanelMap.remove(videoFileName);
 			videoMediaPanel.getMediaPlayer().stop();
 			videoMediaPanel.setVisible(false);
 			videoMediaPanel.invalidate();
 			videoMediaPanel.killCurrentPlayer();
 		}
-		mediaPanelMap.remove(videoFileName);
 		
 		return "Video Media Stopped";
 	}

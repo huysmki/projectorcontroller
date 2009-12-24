@@ -73,6 +73,10 @@ public class ScenarioPlayer implements Runnable {
 		}
 		isPaused = false;
 		isPlaying = false;
+		List<Client> clients = scenarioToPlay.getClients();
+		for (Client client : clients) {
+			sendSimpleProtocolCommand(client, PCP.STOP, null);		
+		}
 		fireStateChangeListeners(new StateChangedEvent(State.STOP));
 		return true;
 	}
@@ -86,7 +90,7 @@ public class ScenarioPlayer implements Runnable {
 		return null;
 	}
 
-	private void sendSimpleProtocolCommand(Client client, String command, String[] parameters) {
+	private static void sendSimpleProtocolCommand(Client client, String command, String[] parameters) {
 		
 		try {
 //			//System.out.println("Send command " + command + " to " + client.getHost() + ":" + client.getPort());
