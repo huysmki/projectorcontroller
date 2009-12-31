@@ -23,6 +23,7 @@ import be.rhea.projector.controller.server.player.StateChangedEvent;
 import be.rhea.projector.controller.server.player.StateChangedListener;
 import be.rhea.projector.controller.server.player.StateChangedEvent.State;
 import be.rhea.projector.controller.server.scenario.Client;
+import be.rhea.projector.controller.server.scenario.ClientType;
 import be.rhea.projector.controller.server.scenario.Scenario;
 import be.rhea.projector.controller.server.scenario.Scene;
 
@@ -121,16 +122,22 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 			JLabel label = new JLabel(client.getName());
 			label.setAlignmentX(CENTER_ALIGNMENT);
 			overviewClientsPanel.add(label);
-			try {
-				ClientPanel clientPanel = new ClientPanel("C:/temp/gekko/show/", client.getPort());
-				clientPanel.setPreferredSize(new Dimension(200,150));
-				clientPanel.setMinimumSize(new Dimension(200,150));
-				clientPanel.setMaximumSize(new Dimension(200,150));
-				clientPanel.setAlignmentX(CENTER_ALIGNMENT);
-				overviewClientsPanel.add(clientPanel);
-				clientPanels.add(clientPanel);
-			} catch (IOException e) {
-				e.printStackTrace();
+			if (client.getType() == ClientType.PROJECTOR) {
+				try {
+					ClientPanel clientPanel = new ClientPanel("C:/temp/gekko/show/", client.getPort());
+					clientPanel.setPreferredSize(new Dimension(200,150));
+					clientPanel.setMinimumSize(new Dimension(200,150));
+					clientPanel.setMaximumSize(new Dimension(200,150));
+					clientPanel.setAlignmentX(CENTER_ALIGNMENT);
+					overviewClientsPanel.add(clientPanel);
+					clientPanels.add(clientPanel);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else if (client.getType() == ClientType.ARTNET) {
+				JLabel toBeImplementedLabel = new JLabel("ArtNet Previewer to be implemented");
+				toBeImplementedLabel.setAlignmentX(CENTER_ALIGNMENT);
+				overviewClientsPanel.add(toBeImplementedLabel);
 			}
 		}
 		JScrollPane scrollPane2 = new JScrollPane(overviewClientsPanel);

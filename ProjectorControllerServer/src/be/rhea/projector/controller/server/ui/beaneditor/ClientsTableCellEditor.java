@@ -10,6 +10,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 
 import be.rhea.projector.controller.server.scenario.Client;
+import be.rhea.projector.controller.server.scenario.ClientType;
 
 public class ClientsTableCellEditor extends AbstractCellEditor implements
 		TableCellEditor {
@@ -17,10 +18,12 @@ public class ClientsTableCellEditor extends AbstractCellEditor implements
 	private final int clientId;
 	private final List<Client> clients;
 	private JComboBox comboBox;
+	private final ClientType allowedClientType;
 
-	public ClientsTableCellEditor(int clientId, List<Client> clients) {
+	public ClientsTableCellEditor(int clientId, List<Client> clients, ClientType allowedClientType) {
 		this.clientId = clientId;
 		this.clients = clients;
+		this.allowedClientType = allowedClientType;
 	}
 
 	public Component getTableCellEditorComponent(JTable jtable, Object obj,
@@ -30,9 +33,11 @@ public class ClientsTableCellEditor extends AbstractCellEditor implements
 		comboBox.setFont(font.deriveFont(Font.PLAIN));
 		
 		for (Client client : clients) {
-			comboBox.addItem(client);
-			if (client.getId() == clientId) {
-				comboBox.setSelectedItem(client);
+			if (client.getType() == allowedClientType) {
+				comboBox.addItem(client);
+				if (client.getId() == clientId) {
+					comboBox.setSelectedItem(client);
+				}
 			}
 		}
 		return comboBox;

@@ -3,7 +3,7 @@ package be.rhea.projector.controller.server.scenario.actions;
 import be.rhea.projector.controller.server.annotation.EditableProperty;
 import be.rhea.remote.PCP;
 
-public class PlayImageAction extends AbstractClientAction {
+public class PlayImageAction extends AbstractProjectorClientAction {
 	private static final long serialVersionUID = -210805641078411328L;
 	
 	@EditableProperty(name="FadeIn Time (ms)")

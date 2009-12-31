@@ -27,7 +27,8 @@ import be.rhea.projector.controller.server.scenario.Scenario;
 import be.rhea.projector.controller.server.scenario.Scene;
 import be.rhea.projector.controller.server.scenario.ScenePart;
 import be.rhea.projector.controller.server.scenario.actions.AbstractAction;
-import be.rhea.projector.controller.server.scenario.actions.AbstractClientAction;
+import be.rhea.projector.controller.server.scenario.actions.AbstractArtNetClientAction;
+import be.rhea.projector.controller.server.scenario.actions.AbstractProjectorClientAction;
 import be.rhea.projector.controller.server.scenario.actions.ArtNetAction;
 import be.rhea.projector.controller.server.scenario.actions.ColorAction;
 import be.rhea.projector.controller.server.scenario.actions.FadeOutImageAction;
@@ -274,7 +275,8 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 					for (ScenePart scenePart : sceneParts) {
 						List<AbstractAction> actions = scenePart.getActions();
 						for (AbstractAction action : actions) {
-							if (action instanceof AbstractClientAction && ((AbstractClientAction)action).getClientId() == idToRemove) {
+							if ((action instanceof AbstractProjectorClientAction && ((AbstractProjectorClientAction)action).getClientId() == idToRemove) ||
+								(action instanceof AbstractArtNetClientAction && ((AbstractArtNetClientAction)action).getClientId() == idToRemove)) {
 								JOptionPane.showMessageDialog(null, "Client still used by an Action. Please remove first all usages.", "Error", JOptionPane.ERROR_MESSAGE); 
 								return;
 							}
@@ -293,7 +295,7 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 					id++;
 				}
 			}
-			DefaultMutableTreeNode newClientNode = new DefaultMutableTreeNode(new Client(id, "New Client", "host", 9999));
+			DefaultMutableTreeNode newClientNode = new DefaultMutableTreeNode(new Client(id, "New Client", "255.255.255.255", 9999));
 			clientsItem.add(newClientNode);
 			DefaultTreeModel model = (DefaultTreeModel) this.getModel();
 			if (model != null) {

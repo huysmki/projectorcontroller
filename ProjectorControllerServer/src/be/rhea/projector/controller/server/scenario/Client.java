@@ -15,6 +15,8 @@ public class Client implements Serializable {
 	private String host;
 	@EditableProperty(name = "Port")
 	private int port;
+	@EditableProperty(name = "Type", type=Type.CLIENT_TYPE)
+	private ClientType type = ClientType.PROJECTOR;
 	
 	public Client() {
 	}
@@ -61,5 +63,13 @@ public class Client implements Serializable {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public void setType(ClientType type) {
+		this.type = type;
+	}
+
+	public ClientType getType() {
+		return type;
 	}
 }

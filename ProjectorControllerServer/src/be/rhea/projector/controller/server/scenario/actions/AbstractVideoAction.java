@@ -5,7 +5,7 @@ import java.io.Serializable;
 import be.rhea.projector.controller.server.annotation.EditableProperty;
 import be.rhea.projector.controller.server.annotation.EditableProperty.Type;
 
-public abstract class AbstractVideoAction extends AbstractClientAction implements Serializable {
+public abstract class AbstractVideoAction extends AbstractProjectorClientAction implements Serializable {
 	private static final long serialVersionUID = 4979938776387446471L;
 	@EditableProperty(name = "Filename", type = Type.FILE)
 	protected String fileName;

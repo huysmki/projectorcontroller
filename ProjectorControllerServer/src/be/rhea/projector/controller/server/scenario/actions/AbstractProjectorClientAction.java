@@ -4,13 +4,14 @@ import java.io.Serializable;
 
 import be.rhea.projector.controller.server.annotation.EditableProperty;
 import be.rhea.projector.controller.server.annotation.EditableProperty.Type;
+import be.rhea.projector.controller.server.scenario.ClientType;
 
-public abstract class AbstractClientAction extends AbstractAction implements Serializable {
+public abstract class AbstractProjectorClientAction extends AbstractAction implements Serializable {
 	private static final long serialVersionUID = 4979938776387446471L;
-	@EditableProperty(name = "Client", type= Type.CLIENTS)
+	@EditableProperty(name = "Client", type=Type.CLIENTS, allowedClientType=ClientType.PROJECTOR)
 	private int clientId;
 	
-	public AbstractClientAction(String name, int clientId) {
+	public AbstractProjectorClientAction(String name, int clientId) {
 		super(name);
 		this.clientId = clientId;
 	}
