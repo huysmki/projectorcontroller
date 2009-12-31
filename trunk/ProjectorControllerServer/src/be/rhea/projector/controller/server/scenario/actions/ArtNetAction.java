@@ -6,7 +6,7 @@ import java.util.List;
 import be.rhea.projector.controller.server.annotation.EditableProperty;
 import be.rhea.projector.controller.server.annotation.EditableProperty.Type;
 
-public class ArtNetAction extends AbstractClientAction {
+public class ArtNetAction extends AbstractArtNetClientAction {
 	private static final long serialVersionUID = -83159837672501967L;
 	@EditableProperty(name = "Values", type=Type.ARTNET)
 	private List<Integer> values = new ArrayList<Integer>();

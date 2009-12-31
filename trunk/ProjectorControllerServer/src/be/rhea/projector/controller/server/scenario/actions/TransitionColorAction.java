@@ -6,7 +6,7 @@ import be.rhea.projector.controller.server.annotation.EditableProperty;
 import be.rhea.projector.controller.server.annotation.EditableProperty.Type;
 import be.rhea.remote.PCP;
 
-public class TransitionColorAction extends AbstractClientAction {
+public class TransitionColorAction extends AbstractProjectorClientAction {
 	private static final long serialVersionUID = -8233884029073198849L;
 	@EditableProperty(name = "From Color", type = Type.COLOR)
 	private Color fromColor;

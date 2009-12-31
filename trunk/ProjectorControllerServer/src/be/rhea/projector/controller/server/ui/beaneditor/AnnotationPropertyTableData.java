@@ -17,6 +17,7 @@ import javax.swing.table.TableCellRenderer;
 import be.rhea.projector.controller.server.annotation.EditableProperty;
 import be.rhea.projector.controller.server.annotation.EditableProperty.Type;
 import be.rhea.projector.controller.server.scenario.Client;
+import be.rhea.projector.controller.server.scenario.ClientType;
 
 public class AnnotationPropertyTableData extends AbstractTableModel  {
 	private static final long serialVersionUID = 1L;
@@ -47,7 +48,9 @@ public class AnnotationPropertyTableData extends AbstractTableModel  {
 				PropertyData data = new PropertyData();
 				data.setName(annotation.name());
 				data.setType(annotation.type());
+				data.setAllowedClientType(annotation.allowedClientType());
 				data.setField(field);
+				
 				editableProperties.add(data);
 			}
 		}
@@ -184,6 +187,8 @@ public class AnnotationPropertyTableData extends AbstractTableModel  {
 					arrayList.add(value);
 				}
 				return arrayList;
+			} else if (name.equals("be.rhea.projector.controller.server.scenario.ClientType")) {
+				return ClientType.valueOf(str);
 			}
 			return null; // not supported
 		} catch (Exception ex) {
@@ -213,7 +218,10 @@ public class AnnotationPropertyTableData extends AbstractTableModel  {
 			} else if (propertyData.getType() == Type.BOOLEAN) {
 				BooleanTableCellRenderer booleanTableCellRenderer = new BooleanTableCellRenderer(Boolean.parseBoolean((String) getValueAt(row, column)));
 				return booleanTableCellRenderer;
-			} 
+			} else if (propertyData.getType() == Type.CLIENT_TYPE) {
+				ClientTypeTableCellRenderer booleanTableCellRenderer = new ClientTypeTableCellRenderer((String) getValueAt(row, column));
+				return booleanTableCellRenderer;
+			}
 		}
 		return null;
 	}
@@ -228,13 +236,15 @@ public class AnnotationPropertyTableData extends AbstractTableModel  {
 			} else if (propertyData.getType() == Type.FILE) {
 				return (TableCellEditor) new FileTableCellEditor(valueAt);
 			} else if (propertyData.getType() == Type.CLIENTS) {
-				return (TableCellEditor) new ClientsTableCellEditor(Integer.parseInt(valueAt), clients);
+				return (TableCellEditor) new ClientsTableCellEditor(Integer.parseInt(valueAt), clients, propertyData.getAllowedClientType());
 			} else if (propertyData.getType() == Type.IP) {
 				return (TableCellEditor) new IPTableCellEditor(valueAt);
 			} else if (propertyData.getType() == Type.ARTNET) {
 				return (TableCellEditor) new ArtNetTableCellEditor(((ArrayList<Integer>) stringToObj(valueAt, List.class)));
 			} else if (propertyData.getType() == Type.BOOLEAN) {
 				return (TableCellEditor) new BooleanTableCellEditor(Boolean.parseBoolean((String) getValueAt(row, column)));
+			} else if (propertyData.getType() == Type.CLIENT_TYPE) {
+				return (TableCellEditor) new ClientTypeTableCellEditor((String) getValueAt(row, column));
 			}
 		}
 		return null;

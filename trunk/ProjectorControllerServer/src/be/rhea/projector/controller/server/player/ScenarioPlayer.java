@@ -10,7 +10,8 @@ import be.rhea.projector.controller.server.scenario.Scenario;
 import be.rhea.projector.controller.server.scenario.Scene;
 import be.rhea.projector.controller.server.scenario.ScenePart;
 import be.rhea.projector.controller.server.scenario.actions.AbstractAction;
-import be.rhea.projector.controller.server.scenario.actions.AbstractClientAction;
+import be.rhea.projector.controller.server.scenario.actions.AbstractArtNetClientAction;
+import be.rhea.projector.controller.server.scenario.actions.AbstractProjectorClientAction;
 import be.rhea.projector.controller.server.scenario.actions.ArtNetAction;
 import be.rhea.projector.controller.server.scenario.actions.ManualAcknownledgeAction;
 import be.rhea.projector.controller.server.scenario.actions.RepeatScenePartAction;
@@ -166,11 +167,11 @@ public class ScenarioPlayer implements Runnable {
 						repeatScenePart = true;
 						repeatCount = repreatScenePartAction.getCount();
 					} else if (action instanceof ArtNetAction) {
-						int clientId = ((AbstractClientAction) action).getClientId();
+						int clientId = ((AbstractArtNetClientAction) action).getClientId();
 						Client client = getClientForId(clients, clientId);
 						sendArtNetCommand(client, ((ArtNetAction)action).getValues());
-					} else if (action instanceof AbstractClientAction){
-						int clientId = ((AbstractClientAction) action).getClientId();
+					} else if (action instanceof AbstractProjectorClientAction){
+						int clientId = ((AbstractProjectorClientAction) action).getClientId();
 						Client client = getClientForId(clients, clientId);
 						sendSimpleProtocolCommand(client, command, action.getParameters());
 					}

@@ -4,7 +4,7 @@ import be.rhea.projector.controller.server.annotation.EditableProperty;
 import be.rhea.projector.controller.server.annotation.EditableProperty.Type;
 import be.rhea.remote.PCP;
 
-public class LoadImageAction extends AbstractClientAction {
+public class LoadImageAction extends AbstractProjectorClientAction {
 	private static final long serialVersionUID = -1524974021847781782L;
 	@EditableProperty(name = "Filename", type = Type.FILE)
 	private String fileName;
