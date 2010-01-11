@@ -1,5 +1,6 @@
 package be.rhea.projector.controller.remote.commands.server;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,14 +26,17 @@ public class PCPStopServerCommand implements
 		panel.repaint();
 
 		Set<String> keySet = mediaPanelMap.keySet();
-		for (String key : keySet) {
+		Set<String> copiedSet = new HashSet<String>(keySet);
+		for (String key : copiedSet) {
 			VideoMediaPanel videoMediaPanel = mediaPanelMap.get(key);
-			videoMediaPanel.getMediaPlayer().stop();
-			videoMediaPanel.setVisible(false);
-			videoMediaPanel.invalidate();
-			videoMediaPanel.killCurrentPlayer();
+			if (videoMediaPanel != null) {
+				videoMediaPanel.getMediaPlayer().stop();
+				videoMediaPanel.setVisible(false);
+				videoMediaPanel.invalidate();
+				videoMediaPanel.killCurrentPlayer();
+				mediaPanelMap.remove(key);
+			}
 		}
-		mediaPanelMap.clear();
 		
 		
 		return "Stopped";

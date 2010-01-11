@@ -2,7 +2,6 @@ package be.rhea.projector.controller.server.ui;
 
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -26,6 +25,7 @@ import be.rhea.projector.controller.server.scenario.Client;
 import be.rhea.projector.controller.server.scenario.ClientType;
 import be.rhea.projector.controller.server.scenario.Scenario;
 import be.rhea.projector.controller.server.scenario.Scene;
+import be.rhea.projector.controller.server.ui.artnet.ArtNetPreviewer;
 
 public class PlayerPanel extends JPanel implements ActionListener, StateChangedListener {
 	private static final String STOP = "STOP";
@@ -33,12 +33,14 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 	private static final String PLAY = "PLAY:";
 	private static final long serialVersionUID = 1L;
 	private List<ClientPanel> clientPanels = new ArrayList<ClientPanel>();
+	private List<ArtNetPreviewer> artNetPanels = new ArrayList<ArtNetPreviewer>();
 	private JButton stopButton;
 	private JButton pauseButton;
 	private JLabel statusLabel;
 
 	public PlayerPanel(Scenario scenario) {
-		this.setLayout(new GridLayout(1,3));
+//		this.setLayout(new GridLayout(1,3));
+		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
 		JScrollPane createPlayersPanel = createPlayersPanel(scenario);
 		this.add(createPlayersPanel);
@@ -135,9 +137,18 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 					e.printStackTrace();
 				}
 			} else if (client.getType() == ClientType.ARTNET) {
-				JLabel toBeImplementedLabel = new JLabel("ArtNet Previewer to be implemented");
-				toBeImplementedLabel.setAlignmentX(CENTER_ALIGNMENT);
-				overviewClientsPanel.add(toBeImplementedLabel);
+				ArtNetPreviewer artNetPreviewer;
+				try {
+					artNetPreviewer = new ArtNetPreviewer(client.getPort());
+					artNetPreviewer.setPreferredSize(new Dimension(200,150));
+					artNetPreviewer.setMinimumSize(new Dimension(200,150));
+					artNetPreviewer.setMaximumSize(new Dimension(200,150));				
+					artNetPreviewer.setAlignmentX(CENTER_ALIGNMENT);
+					overviewClientsPanel.add(artNetPreviewer);
+					artNetPanels.add(artNetPreviewer);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}			
 			}
 		}
 		JScrollPane scrollPane2 = new JScrollPane(overviewClientsPanel);
@@ -147,6 +158,9 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 	public void stopMediaPanels() {
 		for (ClientPanel clientPanel : clientPanels) {
 			clientPanel.stopListening();
+		}
+		for (ArtNetPreviewer artNetPanel : artNetPanels) {
+			artNetPanel.stopListening();
 		}
 	}
 	
