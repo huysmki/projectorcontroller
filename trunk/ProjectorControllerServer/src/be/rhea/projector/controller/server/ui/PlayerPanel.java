@@ -13,8 +13,10 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import be.rhea.projector.controller.client.ui.ClientPanel;
 import be.rhea.projector.controller.server.player.ScenarioPlayer;
@@ -39,20 +41,25 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 	private JLabel statusLabel;
 
 	public PlayerPanel(Scenario scenario) {
-//		this.setLayout(new GridLayout(1,3));
 		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-
-		JScrollPane createPlayersPanel = createPlayersPanel(scenario);
-		this.add(createPlayersPanel);
-		
-		JScrollPane midPanel = createPauseStopPanel();
-		this.add(midPanel);
-		
-		JScrollPane createClientPanelPreviewPanel = createClientPanelPreviewPanel(scenario);
-		this.add(createClientPanelPreviewPanel);
-		
-		ScenarioPlayer.addStateChangeListener(this);
-		ScenarioPlayer.setScenario(scenario);
+		if (scenario != null) {
+			JScrollPane createPlayersPanel = createPlayersPanel(scenario);
+			this.add(createPlayersPanel);
+			
+			JScrollPane midPanel = createPauseStopPanel();
+			this.add(midPanel);
+			
+			JScrollPane createClientPanelPreviewPanel = createClientPanelPreviewPanel(scenario);
+			this.add(createClientPanelPreviewPanel);
+			
+			ScenarioPlayer.addStateChangeListener(this);
+			ScenarioPlayer.setScenario(scenario);
+		} else {
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					JOptionPane.showMessageDialog(null, "No scenario available.", "Error", JOptionPane.ERROR_MESSAGE);
+				}});
+		}
 	}
 
 	private JScrollPane createPlayersPanel(Scenario scenario) {

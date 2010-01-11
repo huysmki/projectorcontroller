@@ -1,11 +1,9 @@
 package be.rhea.projector.controller.server.scenario;
 
-import java.io.Serializable;
-
 import be.rhea.projector.controller.server.annotation.EditableProperty;
 import be.rhea.projector.controller.server.annotation.EditableProperty.Type;
 
-public class Client implements Serializable {
+public class Client extends ValueObject {
 	private static final long serialVersionUID = 2816548312557512167L;
 	@EditableProperty(name = "Id")
 	private int id;

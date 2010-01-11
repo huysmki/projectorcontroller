@@ -1,10 +1,9 @@
 package be.rhea.projector.controller.server.scenario.actions;
 
-import java.io.Serializable;
-
 import be.rhea.projector.controller.server.annotation.EditableProperty;
+import be.rhea.projector.controller.server.scenario.ValueObject;
 
-public abstract class AbstractAction implements Serializable {
+public abstract class AbstractAction extends ValueObject {
 	private static final long serialVersionUID = 4979938776387446471L;
 	@EditableProperty(name = "Name")
 	protected String name;
