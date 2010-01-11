@@ -3,6 +3,8 @@ package be.rhea.projector.controller.server;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.BufferedOutputStream;
@@ -17,6 +19,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -26,7 +29,7 @@ import be.rhea.projector.controller.server.scenario.Scenario;
 import be.rhea.projector.controller.server.ui.EditPanel;
 import be.rhea.projector.controller.server.ui.PlayerPanel;
 
-public class ProjectorControllerServer extends JFrame implements ActionListener {
+public class ProjectorControllerServer extends JFrame implements ActionListener, WindowListener {
 	private static final String PLAYER_MODE = "PLAYER_MODE";
 	private static final String EDITOR_MODE = "EDITOR_MODE";
 	private static final String TITLE = "Projector Controller";
@@ -57,6 +60,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener 
 		fileChooser = new JFileChooser();
 		this.setTitle(TITLE);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.addWindowListener(this);
 		createMenu();
 		
 		Container contentPane = this.getContentPane();
@@ -115,14 +119,17 @@ public class ProjectorControllerServer extends JFrame implements ActionListener 
 	public void actionPerformed(ActionEvent actionEvent) {
 		Scenario currentScenario = editPanel.getScenario();
 		if (NEW_SCENARIO.equals(actionEvent.getActionCommand())) {
+			askForSavingScenario();
 			editPanel.setScenario(new Scenario());
 			this.setTitle(TITLE + " " + "NewScenario");
 		} else if (EXIT.equals(actionEvent.getActionCommand())) {
+			windowClosing(null);
 			System.exit(0);
 		} else if (OPEN.equals(actionEvent.getActionCommand())) {
+			askForSavingScenario();
 			fileChooser.setFileFilter(new XMLFileFilter());
 			fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
-			if (fileChooser.showDialog(this, "Select") == JFileChooser.APPROVE_OPTION) {
+			if (fileChooser.showDialog(this, "Open") == JFileChooser.APPROVE_OPTION) {
 				try {
 					selectedFile = fileChooser.getSelectedFile();
 					XMLDecoder decoder = new XMLDecoder(new FileInputStream(
@@ -137,34 +144,15 @@ public class ProjectorControllerServer extends JFrame implements ActionListener 
 				}
 			}
 		} else if (SAVE_AS.equals(actionEvent.getActionCommand())) {
-			try {
-				fileChooser.setFileFilter(new XMLFileFilter());
-				fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
-				if (fileChooser.showDialog(this, "Save") == JFileChooser.APPROVE_OPTION) {
-					selectedFile = fileChooser.getSelectedFile();
-					Scenario scenario = editPanel.getScenario();
-					XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(
-							new FileOutputStream(selectedFile)));
-					encoder.writeObject(scenario);
-					encoder.close();
-					this.setTitle(TITLE + " " + selectedFile);
-				}
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			File cachedFile = selectedFile;
+			selectedFile = null;
+			saveScenario();
+			if (selectedFile == null) {
+				selectedFile = cachedFile;
+				this.setTitle(TITLE + " " + selectedFile);
 			}
 		} else if (SAVE.equals(actionEvent.getActionCommand())) {
-			try {
-				Scenario scenario = editPanel.getScenario();
-				XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(
-						new FileOutputStream(selectedFile)));
-				encoder.writeObject(scenario);
-				encoder.close();
-				this.setTitle(TITLE + " " + selectedFile);
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			askForSavingScenario();
 		} else if (EDITOR_MODE.equals(actionEvent.getActionCommand())) {
 			if (playerPanel != null) {
 				playerPanel.stopMediaPanels();
@@ -179,6 +167,88 @@ public class ProjectorControllerServer extends JFrame implements ActionListener 
 			this.getContentPane().add(playerPanel);
 			SwingUtilities.updateComponentTreeUI(this);
 		}
+	}
+
+	private void saveScenario() {
+		Scenario scenario = editPanel.getScenario();
+		if (scenario != null) {
+			if (selectedFile == null) {
+				try {
+					fileChooser.setFileFilter(new XMLFileFilter());
+					fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+					if (fileChooser.showDialog(this, "Save") == JFileChooser.APPROVE_OPTION) {
+						selectedFile = fileChooser.getSelectedFile();
+						XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(
+								new FileOutputStream(selectedFile)));
+						encoder.writeObject(scenario);
+						encoder.close();
+						this.setTitle(TITLE + " " + selectedFile);
+					}
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+			} else {
+				try {
+					XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(
+							new FileOutputStream(selectedFile)));
+					encoder.writeObject(scenario);
+					encoder.close();
+					this.setTitle(TITLE + " " + selectedFile);
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public void windowActivated(WindowEvent windowEvent) {
+	}
+
+	public void windowClosed(WindowEvent windowEvent) {
+	}
+
+	public void windowClosing(WindowEvent windowEvent) {
+		askForSavingScenario();
+	}
+
+	private void askForSavingScenario() {
+		boolean shouldSave = false;
+		Scenario currentScenario = editPanel.getScenario();
+		if (currentScenario != null) {
+			if (selectedFile == null) {
+				shouldSave = true;
+			} else {
+				try {
+					XMLDecoder decoder = new XMLDecoder(new FileInputStream(
+							selectedFile));
+					Scenario originalScenario = (Scenario) decoder.readObject();
+					decoder.close();	
+					if (!currentScenario.equals(originalScenario)) {
+						shouldSave = true;
+					}
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+				
+			}
+		}		
+		if (shouldSave) {
+			if (JOptionPane.showConfirmDialog(this, "Save scenario?", "Save scenario?",  JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+				saveScenario();
+			}
+		}
+	}
+
+	public void windowDeactivated(WindowEvent windowEvent) {
+	}
+
+	public void windowDeiconified(WindowEvent windowEvent) {
+	}
+
+	public void windowIconified(WindowEvent windowEvent) {
+	}
+
+	public void windowOpened(WindowEvent windowEvent) {
 	}
 
 }
