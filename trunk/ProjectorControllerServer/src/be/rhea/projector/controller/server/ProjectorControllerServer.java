@@ -63,7 +63,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener 
 		editPanel = new EditPanel();
 		contentPane.add(editPanel);
 
-		this.setSize(800, 600);
+		this.setSize(1000, 600);
 		this.setVisible(true);
 	}
 

@@ -6,6 +6,7 @@ import java.util.List;
 
 import be.rhea.projector.controller.server.player.StateChangedEvent.State;
 import be.rhea.projector.controller.server.scenario.Client;
+import be.rhea.projector.controller.server.scenario.ClientType;
 import be.rhea.projector.controller.server.scenario.Scenario;
 import be.rhea.projector.controller.server.scenario.Scene;
 import be.rhea.projector.controller.server.scenario.ScenePart;
@@ -47,6 +48,14 @@ public class ScenarioPlayer implements Runnable {
 			return false;
 		}
 		sceneIdToPlay = sceneId;
+		if (playerThread != null) {
+			while (playerThread.isAlive()) {
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+				}
+			}
+		}
 		playerThread = new Thread(new ScenarioPlayer());
 		isPlaying = true;
 		isPaused = false;
@@ -76,7 +85,9 @@ public class ScenarioPlayer implements Runnable {
 		isPlaying = false;
 		List<Client> clients = scenarioToPlay.getClients();
 		for (Client client : clients) {
-			sendSimpleProtocolCommand(client, PCP.STOP, null);		
+			if (client.getType() == ClientType.PROJECTOR) {
+				sendSimpleProtocolCommand(client, PCP.STOP, null);
+			}
 		}
 		fireStateChangeListeners(new StateChangedEvent(State.STOP));
 		return true;
