@@ -23,13 +23,16 @@ import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 import be.rhea.projector.controller.server.filefilter.XMLFileFilter;
 import be.rhea.projector.controller.server.scenario.Scenario;
 import be.rhea.projector.controller.server.ui.EditPanel;
 import be.rhea.projector.controller.server.ui.PlayerPanel;
+import be.rhea.projector.controller.server.util.StatusHolder;
 
-public class ProjectorControllerServer extends JFrame implements ActionListener, WindowListener {
+public class ProjectorControllerServer extends JFrame implements ActionListener, WindowListener, MenuListener {
 	private static final String PLAYER_MODE = "PLAYER_MODE";
 	private static final String EDITOR_MODE = "EDITOR_MODE";
 	private static final String TITLE = "Projector Controller";
@@ -43,6 +46,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 	private File selectedFile;
 	private EditPanel editPanel;
 	private PlayerPanel playerPanel;
+	private JMenu fileMenu;
 
 	public static void main(String[] args) throws Exception {
 		ProjectorControllerServer server = new ProjectorControllerServer();
@@ -58,6 +62,10 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 			e.printStackTrace();
 		}
 		fileChooser = new JFileChooser();
+		File lastAccessedDir = StatusHolder.getInstance().getLastAccessedDir();
+		if (lastAccessedDir != null) {
+			fileChooser.setCurrentDirectory(lastAccessedDir);
+		}
 		this.setTitle(TITLE);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.addWindowListener(this);
@@ -74,7 +82,8 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 
 	private void createMenu() {
 		JMenuBar menuBar = new JMenuBar();
-		JMenu fileMenu = new JMenu("File");
+		fileMenu = new JMenu("File");
+		fileMenu.addMenuListener(this);
 		JMenuItem newScenario = new JMenuItem("New");
 		newScenario.setActionCommand(NEW_SCENARIO);
 		JMenuItem open = new JMenuItem("Open...");
@@ -124,6 +133,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 			this.setTitle(TITLE + " " + "NewScenario");
 		} else if (EXIT.equals(actionEvent.getActionCommand())) {
 			windowClosing(null);
+			StatusHolder.saveSettings();
 			System.exit(0);
 		} else if (OPEN.equals(actionEvent.getActionCommand())) {
 			askForSavingScenario();
@@ -138,8 +148,10 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 					decoder.close();
 					editPanel.setScenario(currentScenario);
 					this.setTitle(TITLE + " " + selectedFile);
+					StatusHolder statusHolder = StatusHolder.getInstance();
+					statusHolder.addRecentlyUsedFile(selectedFile);
+					statusHolder.setLastAccessedDir(selectedFile.getParentFile());
 				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -183,6 +195,9 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 						encoder.writeObject(scenario);
 						encoder.close();
 						this.setTitle(TITLE + " " + selectedFile);
+						StatusHolder statusHolder = StatusHolder.getInstance();
+						statusHolder.addRecentlyUsedFile(selectedFile);
+						statusHolder.setLastAccessedDir(selectedFile.getParentFile());
 					}
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
@@ -209,6 +224,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 
 	public void windowClosing(WindowEvent windowEvent) {
 		askForSavingScenario();
+		StatusHolder.saveSettings();
 	}
 
 	private void askForSavingScenario() {
@@ -249,6 +265,23 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 	}
 
 	public void windowOpened(WindowEvent windowEvent) {
+	}
+
+	public void menuCanceled(MenuEvent menuevent) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void menuDeselected(MenuEvent menuevent) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void menuSelected(MenuEvent menuevent) {
+		if (fileMenu.equals(menuevent.getSource())) {
+			System.out.println("Open File menu");
+		} 
+		
 	}
 
 }
