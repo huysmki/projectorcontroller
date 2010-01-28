@@ -11,7 +11,7 @@ import java.io.Serializable;
 public class StatusHolder implements Serializable {
 	private static final String PROJECTOR_CONTROLLER_SETTINGS_FILENAME = "ProjectorControllerSettings.obj";
 	private static final long serialVersionUID = 1L;
-	private LimitedList recentlyUsedFiles = new LimitedList();
+	private LimitedSet<File> recentlyUsedFiles = new LimitedSet<File>();
 	private File lastAccessedDir = new File(System.getProperty("user.home"));
 	private static transient StatusHolder statusHolder;
 	
@@ -55,15 +55,16 @@ public class StatusHolder implements Serializable {
 		return lastAccessedDir;
 	}
 
-	public void setRecentlyUsedFiles(LimitedList recentlyUsedFiles) {
+	public void setRecentlyUsedFiles(LimitedSet<File> recentlyUsedFiles) {
 		this.recentlyUsedFiles = recentlyUsedFiles;
 	}
 
-	public LimitedList getRecentlyUsedFiles() {
+	public LimitedSet<File> getRecentlyUsedFiles() {
 		return recentlyUsedFiles;
 	}
 
 	public void addRecentlyUsedFile(File selectedFile) {
+		recentlyUsedFiles.remove(selectedFile);
 		recentlyUsedFiles.add(selectedFile);
 	}
 }

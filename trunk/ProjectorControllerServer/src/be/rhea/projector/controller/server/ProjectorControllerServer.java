@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.Iterator;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JFileChooser;
@@ -30,6 +31,7 @@ import be.rhea.projector.controller.server.filefilter.XMLFileFilter;
 import be.rhea.projector.controller.server.scenario.Scenario;
 import be.rhea.projector.controller.server.ui.EditPanel;
 import be.rhea.projector.controller.server.ui.PlayerPanel;
+import be.rhea.projector.controller.server.util.LimitedSet;
 import be.rhea.projector.controller.server.util.StatusHolder;
 
 public class ProjectorControllerServer extends JFrame implements ActionListener, WindowListener, MenuListener {
@@ -47,6 +49,8 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 	private EditPanel editPanel;
 	private PlayerPanel playerPanel;
 	private JMenu fileMenu;
+	private JMenu modeMenu;
+	private JRadioButtonMenuItem playerModeMenu;
 
 	public static void main(String[] args) throws Exception {
 		ProjectorControllerServer server = new ProjectorControllerServer();
@@ -108,14 +112,15 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 		save.addActionListener(this);
 		saveAs.addActionListener(this);
 		exit.addActionListener(this);
-		JMenu modeMenu = new JMenu("Mode");
+		modeMenu = new JMenu("Mode");
+		modeMenu.addMenuListener(this);
 		ButtonGroup group = new ButtonGroup();
 		JRadioButtonMenuItem editModeMenu = new JRadioButtonMenuItem("Editor");
 		group.add(editModeMenu);
 		editModeMenu.setSelected(true);
 		editModeMenu.setActionCommand(EDITOR_MODE);
 		editModeMenu.addActionListener(this);
-		JRadioButtonMenuItem playerModeMenu = new JRadioButtonMenuItem("Player");
+		playerModeMenu = new JRadioButtonMenuItem("Player");
 		group.add(playerModeMenu);
 		playerModeMenu.setActionCommand(PLAYER_MODE);
 		playerModeMenu.addActionListener(this);
@@ -131,6 +136,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 			askForSavingScenario();
 			editPanel.setScenario(new Scenario());
 			this.setTitle(TITLE + " " + "NewScenario");
+			selectedFile = null;
 		} else if (EXIT.equals(actionEvent.getActionCommand())) {
 			windowClosing(null);
 			StatusHolder.saveSettings();
@@ -164,7 +170,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 				this.setTitle(TITLE + " " + selectedFile);
 			}
 		} else if (SAVE.equals(actionEvent.getActionCommand())) {
-			askForSavingScenario();
+			saveScenario();
 		} else if (EDITOR_MODE.equals(actionEvent.getActionCommand())) {
 			if (playerPanel != null) {
 				playerPanel.stopMediaPanels();
@@ -268,18 +274,24 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 	}
 
 	public void menuCanceled(MenuEvent menuevent) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public void menuDeselected(MenuEvent menuevent) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public void menuSelected(MenuEvent menuevent) {
 		if (fileMenu.equals(menuevent.getSource())) {
 			System.out.println("Open File menu");
+			LimitedSet<File> recentlyUsedFiles = StatusHolder.getInstance().getRecentlyUsedFiles();
+			
+			for (Iterator<File> iterator = recentlyUsedFiles.iterator(); iterator
+					.hasNext();) {
+				File file = iterator.next();
+				System.out.println(file);
+				
+			}
+		} else if (modeMenu.equals(menuevent.getSource())) {
+			playerModeMenu.setEnabled(editPanel.getScenario() != null);
 		} 
 		
 	}
