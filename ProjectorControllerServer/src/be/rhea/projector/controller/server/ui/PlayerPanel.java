@@ -91,7 +91,9 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 		pauseButton.setPreferredSize(new Dimension(150,150));
 		pauseButton.setMinimumSize(new Dimension(150,150));
 		pauseButton.setMaximumSize(new Dimension(150,150));
+		pauseButton.setEnabled(false);
 		stopPausePanel.add(pauseButton);
+		
 		
 		stopPausePanel.add(Box.createRigidArea(new Dimension(40,0)));
 
@@ -102,6 +104,7 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 		stopButton.setPreferredSize(new Dimension(150,150));
 		stopButton.setMinimumSize(new Dimension(150,150));
 		stopButton.setMaximumSize(new Dimension(150,150));
+		stopButton.setEnabled(false);
 		stopPausePanel.add(stopButton);
 		stopPausePanel.add(Box.createHorizontalGlue());
 
