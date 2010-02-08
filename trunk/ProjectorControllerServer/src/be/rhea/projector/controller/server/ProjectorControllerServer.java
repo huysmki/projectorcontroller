@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.util.Iterator;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JFileChooser;
@@ -44,6 +43,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 	private static final String SAVE_AS = "SAVE_AS";
 	private static final String NEW_SCENARIO = "NEW_SCENARIO";
 	private static final String EXIT = "EXIT";
+	private static final String LRU = "LRU|";
 	private static JFileChooser fileChooser;
 	private File selectedFile;
 	private EditPanel editPanel;
@@ -51,6 +51,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 	private JMenu fileMenu;
 	private JMenu modeMenu;
 	private JRadioButtonMenuItem playerModeMenu;
+	private JMenu recentlyUsed;
 
 	public static void main(String[] args) throws Exception {
 		ProjectorControllerServer server = new ProjectorControllerServer();
@@ -87,11 +88,12 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 	private void createMenu() {
 		JMenuBar menuBar = new JMenuBar();
 		fileMenu = new JMenu("File");
-		fileMenu.addMenuListener(this);
 		JMenuItem newScenario = new JMenuItem("New");
 		newScenario.setActionCommand(NEW_SCENARIO);
 		JMenuItem open = new JMenuItem("Open...");
 		open.setActionCommand(OPEN);
+		recentlyUsed = new JMenu("Recently Used");
+		recentlyUsed.addMenuListener(this);
 		JMenuItem save = new JMenuItem("Save");
 		save.setActionCommand(SAVE);
 		JMenuItem saveAs = new JMenuItem("Save As...");
@@ -101,6 +103,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 		menuBar.add(fileMenu);
 		fileMenu.add(newScenario);
 		fileMenu.add(open);
+		fileMenu.add(recentlyUsed);
 		fileMenu.addSeparator();
 		fileMenu.add(save);
 		fileMenu.add(saveAs);
@@ -184,6 +187,23 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 			playerPanel = new PlayerPanel(editPanel.getScenario());
 			this.getContentPane().add(playerPanel);
 			SwingUtilities.updateComponentTreeUI(this);
+		} else if (actionEvent.getActionCommand().startsWith(LRU)) {
+			askForSavingScenario();
+			try {
+				String fileAsString = actionEvent.getActionCommand().split("\\|")[1];
+				selectedFile = new File(fileAsString);
+				XMLDecoder decoder  = new XMLDecoder(new FileInputStream(
+							selectedFile));
+				currentScenario = (Scenario) decoder.readObject();
+				decoder.close();
+				editPanel.setScenario(currentScenario);
+				this.setTitle(TITLE + " " + selectedFile);
+				StatusHolder statusHolder = StatusHolder.getInstance();
+				statusHolder.addRecentlyUsedFile(selectedFile);
+			statusHolder.setLastAccessedDir(selectedFile.getParentFile());
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -280,15 +300,18 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 	}
 
 	public void menuSelected(MenuEvent menuevent) {
-		if (fileMenu.equals(menuevent.getSource())) {
-			System.out.println("Open File menu");
+		if (recentlyUsed.equals(menuevent.getSource())) {
 			LimitedSet<File> recentlyUsedFiles = StatusHolder.getInstance().getRecentlyUsedFiles();
+			File[] recentlyUsedFilesAsArray = (File[]) recentlyUsedFiles.toArray(new File[]{});
 			
-			for (Iterator<File> iterator = recentlyUsedFiles.iterator(); iterator
-					.hasNext();) {
-				File file = iterator.next();
-				System.out.println(file);
-				
+			recentlyUsed.removeAll();
+			for (int i = recentlyUsedFilesAsArray.length; i > 0; i--) {
+				File file = recentlyUsedFilesAsArray[i - 1];
+				JMenuItem ruMenuItem = new JMenuItem(file.toString());
+				ruMenuItem.setActionCommand(LRU + file);
+				ruMenuItem.addActionListener(this);
+				recentlyUsed.add(ruMenuItem);
+			
 			}
 		} else if (modeMenu.equals(menuevent.getSource())) {
 			playerModeMenu.setEnabled(editPanel.getScenario() != null);
