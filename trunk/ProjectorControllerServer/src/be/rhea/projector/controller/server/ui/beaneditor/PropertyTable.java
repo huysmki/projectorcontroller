@@ -1,16 +1,20 @@
 package be.rhea.projector.controller.server.ui.beaneditor;
 
-import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
-public class PropertyTable extends JTable {
+import org.jdesktop.swingx.JXTable;
+
+public class PropertyTable extends JXTable {
 	private static final long serialVersionUID = 1L;
 	private AnnotationPropertyTableData data;
 
 	public void setPropertyTableData(AnnotationPropertyTableData data) {
 		this.data = data;
 		this.setModel(data);
+//		this.setHighlighters(new HighlighterPipeline());
+//		this.getHighlighters().addHighlighter(AlternateRowHighlighter.classicLinePrinter);
+//		firePropertyChange("highlighterKey", null, );
 	}
 	
 //	I think there are two cases.  In one, the JTable itself has the focus (I think this happens when the 
