@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import be.rhea.projector.controller.server.ProjectorControllerServer;
 import be.rhea.projector.controller.server.player.StateChangedEvent.State;
 import be.rhea.projector.controller.server.scenario.Client;
 import be.rhea.projector.controller.server.scenario.ClientType;
@@ -113,8 +114,7 @@ public class ScenarioPlayer implements Runnable {
 			socketClient.sendCommand(command, parameters);
 			socketClient.disconnect();
 		} catch (IOException e) {
-			//TODO log
-			e.printStackTrace();
+			ProjectorControllerServer.showError(e);
 		}
 	}
 	
@@ -124,8 +124,7 @@ public class ScenarioPlayer implements Runnable {
 			ArtNetProtocolUDPWithRetryClient socketClient = new ArtNetProtocolUDPWithRetryClient(client.getHost(), client.getPort());
 			socketClient.sendData(data);
 		} catch (IOException e) {
-			//TODO log
-			e.printStackTrace();
+			ProjectorControllerServer.showError(e);
 		}
 	}	
 
@@ -152,7 +151,6 @@ public class ScenarioPlayer implements Runnable {
 						try {
 							Thread.sleep(100);
 						} catch (InterruptedException e) {
-							e.printStackTrace();
 							return;
 						}
 						if (!isPlaying) {
@@ -164,8 +162,7 @@ public class ScenarioPlayer implements Runnable {
 						try {
 							Thread.sleep(((SleepAction)action).getTime());
 						} catch (InterruptedException e) {
-							//TODO log
-							e.printStackTrace();
+							ProjectorControllerServer.showError(e);
 						}
 						
 					} else if (action instanceof ManualAcknownledgeAction) {

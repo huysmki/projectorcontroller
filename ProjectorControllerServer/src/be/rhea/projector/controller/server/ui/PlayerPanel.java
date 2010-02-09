@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import be.rhea.projector.controller.client.ui.ClientPanel;
+import be.rhea.projector.controller.server.ProjectorControllerServer;
 import be.rhea.projector.controller.server.player.ScenarioPlayer;
 import be.rhea.projector.controller.server.player.StateChangedEvent;
 import be.rhea.projector.controller.server.player.StateChangedListener;
@@ -28,6 +30,7 @@ import be.rhea.projector.controller.server.scenario.ClientType;
 import be.rhea.projector.controller.server.scenario.Scenario;
 import be.rhea.projector.controller.server.scenario.Scene;
 import be.rhea.projector.controller.server.ui.artnet.ArtNetPreviewer;
+import be.rhea.projector.controller.server.util.StatusHolder;
 
 public class PlayerPanel extends JPanel implements ActionListener, StateChangedListener {
 	private static final String STOP = "STOP";
@@ -39,6 +42,7 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 	private JButton stopButton;
 	private JButton pauseButton;
 	private JLabel statusLabel;
+	private String mediaDir;
 
 	public PlayerPanel(Scenario scenario) {
 		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -54,6 +58,12 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 			
 			ScenarioPlayer.addStateChangeListener(this);
 			ScenarioPlayer.setScenario(scenario);
+			mediaDir = StatusHolder.getInstance().getMediaDir();
+			mediaDir = JOptionPane.showInputDialog(this, "Please provide media directory : ", mediaDir);
+			if (!mediaDir.endsWith(File.separator)) {
+				mediaDir += File.separator;
+			}
+			StatusHolder.getInstance().setMediaDir(mediaDir);
 		} else {
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
@@ -136,7 +146,7 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 			overviewClientsPanel.add(label);
 			if (client.getType() == ClientType.PROJECTOR) {
 				try {
-					ClientPanel clientPanel = new ClientPanel("C:/temp/gekko/show/", client.getPort());
+					ClientPanel clientPanel = new ClientPanel(mediaDir, client.getPort());
 					clientPanel.setPreferredSize(new Dimension(200,150));
 					clientPanel.setMinimumSize(new Dimension(200,150));
 					clientPanel.setMaximumSize(new Dimension(200,150));
@@ -144,7 +154,7 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 					overviewClientsPanel.add(clientPanel);
 					clientPanels.add(clientPanel);
 				} catch (IOException e) {
-					e.printStackTrace();
+					ProjectorControllerServer.showError(e);
 				}
 			} else if (client.getType() == ClientType.ARTNET) {
 				ArtNetPreviewer artNetPreviewer;
@@ -157,7 +167,7 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 					overviewClientsPanel.add(artNetPreviewer);
 					artNetPanels.add(artNetPreviewer);
 				} catch (IOException e) {
-					e.printStackTrace();
+					ProjectorControllerServer.showError(e);
 				}			
 			}
 		}

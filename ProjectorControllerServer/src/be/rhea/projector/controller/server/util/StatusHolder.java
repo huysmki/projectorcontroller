@@ -8,12 +8,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import be.rhea.projector.controller.server.ProjectorControllerServer;
+
 public class StatusHolder implements Serializable {
 	private static final String PROJECTOR_CONTROLLER_SETTINGS_FILENAME = "ProjectorControllerSettings.obj";
 	private static final long serialVersionUID = 1L;
 	private LimitedSet<File> recentlyUsedFiles = new LimitedSet<File>();
 	private File lastAccessedDir = new File(System.getProperty("user.home"));
 	private static transient StatusHolder statusHolder;
+	private String mediaDir;
 	
 	public static StatusHolder getInstance() {
 		if (statusHolder == null) {
@@ -23,9 +26,9 @@ public class StatusHolder implements Serializable {
 				try {
 					statusHolder = (StatusHolder) new ObjectInputStream(new FileInputStream(statusFile)).readObject();
 				} catch (IOException e) {
-					e.printStackTrace();
+					ProjectorControllerServer.showError(e);
 				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
+					ProjectorControllerServer.showError(e);
 				} 
 			} else {
 				statusHolder = new StatusHolder();
@@ -42,7 +45,7 @@ public class StatusHolder implements Serializable {
 			try {
 				new ObjectOutputStream(new FileOutputStream(statusFile)).writeObject(statusHolder);
 			} catch (IOException e) {
-				e.printStackTrace();
+				ProjectorControllerServer.showError(e);
 			}
 		}
 	}
@@ -66,5 +69,14 @@ public class StatusHolder implements Serializable {
 	public void addRecentlyUsedFile(File selectedFile) {
 		recentlyUsedFiles.remove(selectedFile);
 		recentlyUsedFiles.add(selectedFile);
+	}
+
+	public void setMediaDir(String mediaDir) {
+		this.mediaDir = mediaDir;
+		
+	}
+
+	public String getMediaDir() {
+		return mediaDir;
 	}
 }

@@ -21,6 +21,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import be.rhea.projector.controller.server.ProjectorControllerServer;
 import be.rhea.projector.controller.server.annotation.EditableProperty;
 import be.rhea.projector.controller.server.scenario.Client;
 import be.rhea.projector.controller.server.scenario.Scenario;
@@ -423,9 +424,9 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 			copyProperties (clonedObject, objectToClone, objectToClone.getClass());
 			return clonedObject; 
 		} catch (InstantiationException e) {
-			e.printStackTrace();
+			ProjectorControllerServer.showError(e);
 		} catch (IllegalAccessException e) {
-			e.printStackTrace();
+			ProjectorControllerServer.showError(e);
 		}
 		
 		return null;
