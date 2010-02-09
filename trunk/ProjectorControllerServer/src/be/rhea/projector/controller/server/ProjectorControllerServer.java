@@ -26,6 +26,8 @@ import javax.swing.UIManager;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import org.jdesktop.swingx.JXErrorDialog;
+
 import be.rhea.projector.controller.server.filefilter.XMLFileFilter;
 import be.rhea.projector.controller.server.scenario.Scenario;
 import be.rhea.projector.controller.server.ui.EditPanel;
@@ -57,14 +59,19 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 		ProjectorControllerServer server = new ProjectorControllerServer();
 		server.start();
 	}
+	
+	public static void showError(Exception e) {
+		JXErrorDialog.showDialog(null, "Unexpected error occured", e);
+	}
 
 	private void start() {
 		try {
+			
+			//UIManager.setLookAndFeel(LookAndFeelAddons.getBestMatchAddonClassName());
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 			SwingUtilities.updateComponentTreeUI(this);		
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ProjectorControllerServer.showError(e);
 		}
 		fileChooser = new JFileChooser();
 		File lastAccessedDir = StatusHolder.getInstance().getLastAccessedDir();
@@ -161,7 +168,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 					statusHolder.addRecentlyUsedFile(selectedFile);
 					statusHolder.setLastAccessedDir(selectedFile.getParentFile());
 				} catch (FileNotFoundException e) {
-					e.printStackTrace();
+					ProjectorControllerServer.showError(e);
 				}
 			}
 		} else if (SAVE_AS.equals(actionEvent.getActionCommand())) {
@@ -202,7 +209,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 				statusHolder.addRecentlyUsedFile(selectedFile);
 			statusHolder.setLastAccessedDir(selectedFile.getParentFile());
 			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+				ProjectorControllerServer.showError(e);
 			}
 		}
 	}
@@ -226,7 +233,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 						statusHolder.setLastAccessedDir(selectedFile.getParentFile());
 					}
 				} catch (FileNotFoundException e) {
-					e.printStackTrace();
+					ProjectorControllerServer.showError(e);
 				}
 			} else {
 				try {
@@ -236,7 +243,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 					encoder.close();
 					this.setTitle(TITLE + " " + selectedFile);
 				} catch (FileNotFoundException e) {
-					e.printStackTrace();
+					ProjectorControllerServer.showError(e);
 				}
 			}
 		}
@@ -269,7 +276,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 						shouldSave = true;
 					}
 				} catch (FileNotFoundException e) {
-					e.printStackTrace();
+					ProjectorControllerServer.showError(e);
 				}
 				
 			}

@@ -14,6 +14,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
+import be.rhea.projector.controller.server.ProjectorControllerServer;
 import be.rhea.projector.controller.server.annotation.EditableProperty;
 import be.rhea.projector.controller.server.annotation.EditableProperty.Type;
 import be.rhea.projector.controller.server.scenario.Client;
@@ -86,11 +87,9 @@ public class AnnotationPropertyTableData extends AbstractTableModel  {
 			try {
 				return objToString(field.get(bean));
 			} catch (IllegalArgumentException e) {
-				//TODO error handling
-				e.printStackTrace();
+				ProjectorControllerServer.showError(e);
 			} catch (IllegalAccessException e) {
-				//TODO error handling
-				e.printStackTrace();
+				ProjectorControllerServer.showError(e);
 			}
 		}
 		return "";
@@ -106,11 +105,9 @@ public class AnnotationPropertyTableData extends AbstractTableModel  {
 		try {
 			field.set(bean, stringToObj(str, field.getType()));
 		} catch (IllegalArgumentException e) {
-			//TODO error handling
-			e.printStackTrace();
+			ProjectorControllerServer.showError(e);
 		} catch (IllegalAccessException e) {
-			//TODO error handling
-			e.printStackTrace();
+			ProjectorControllerServer.showError(e);
 		}
 		
 	}
