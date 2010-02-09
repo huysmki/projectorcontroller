@@ -47,6 +47,11 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 	public PlayerPanel(Scenario scenario) {
 		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		if (scenario != null) {
+			mediaDir = StatusHolder.getInstance().getMediaDir();
+			mediaDir = JOptionPane.showInputDialog(this, "Please provide media directory : ", mediaDir);
+
+			StatusHolder.getInstance().setMediaDir(mediaDir);
+
 			JScrollPane createPlayersPanel = createPlayersPanel(scenario);
 			this.add(createPlayersPanel);
 			
@@ -58,12 +63,6 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 			
 			ScenarioPlayer.addStateChangeListener(this);
 			ScenarioPlayer.setScenario(scenario);
-			mediaDir = StatusHolder.getInstance().getMediaDir();
-			mediaDir = JOptionPane.showInputDialog(this, "Please provide media directory : ", mediaDir);
-			if (!mediaDir.endsWith(File.separator)) {
-				mediaDir += File.separator;
-			}
-			StatusHolder.getInstance().setMediaDir(mediaDir);
 		} else {
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
