@@ -71,7 +71,7 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 			SwingUtilities.updateComponentTreeUI(this);		
 		} catch (Exception e) {
-			ProjectorControllerServer.showError(e);
+			//ProjectorControllerServer.showError(e);
 		}
 		fileChooser = new JFileChooser();
 		File lastAccessedDir = StatusHolder.getInstance().getLastAccessedDir();
