@@ -188,11 +188,13 @@ public class ProjectorControllerServer extends JFrame implements ActionListener,
 			}
 			this.getContentPane().removeAll();
 			this.getContentPane().add(editPanel);
+			fileMenu.setVisible(true);
 			SwingUtilities.updateComponentTreeUI(this);
 		} else if (PLAYER_MODE.equals(actionEvent.getActionCommand())) {
 			this.getContentPane().removeAll();
 			playerPanel = new PlayerPanel(editPanel.getScenario());
 			this.getContentPane().add(playerPanel);
+			fileMenu.setVisible(false);
 			SwingUtilities.updateComponentTreeUI(this);
 		} else if (actionEvent.getActionCommand().startsWith(LRU)) {
 			askForSavingScenario();

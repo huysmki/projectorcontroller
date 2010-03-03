@@ -10,6 +10,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
 
+import be.rhea.remote.PCP;
+
 public class SimpleProtocolTCPServer extends SimpleProtocolServer implements Runnable {
 
 	private static final String HELLO = "HELLO";
@@ -117,7 +119,7 @@ public class SimpleProtocolTCPServer extends SimpleProtocolServer implements Run
 							close(socket, out, in);
 							break;
 						} else {
-							String[] lineParts = line.split(" ");
+							String[] lineParts = line.split(PCP.PARAMETER_DELIMITER);
 							SimpleProtocolServerCommand command = (SimpleProtocolServerCommand) commandMap
 									.get(lineParts[0]);
 							String[] parameters = null;

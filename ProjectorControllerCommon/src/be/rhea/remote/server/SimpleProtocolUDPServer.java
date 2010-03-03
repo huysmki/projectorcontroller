@@ -5,6 +5,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.logging.Level;
 
+import be.rhea.remote.PCP;
+
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class SimpleProtocolUDPServer extends SimpleProtocolServer implements Runnable {
@@ -68,7 +70,7 @@ public class SimpleProtocolUDPServer extends SimpleProtocolServer implements Run
 		public void run() {
 			try {
 				String line = new String(packet.getData(), 0, packet.getLength());
-				String[] lineParts = line.split(" ");
+				String[] lineParts = line.split(PCP.PARAMETER_DELIMITER);
 				SimpleProtocolServerCommand command = (SimpleProtocolServerCommand) commandMap
 						.get(lineParts[0]);
 				String[] parameters = null;
