@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public abstract class SimpleProtocolServer {
-
+	
 	protected Map<String, SimpleProtocolServerCommand> commandMap;
 	protected Logger logger;
 

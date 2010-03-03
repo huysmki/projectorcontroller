@@ -8,6 +8,8 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import be.rhea.remote.PCP;
+
 
 public class SimpleProtocolTCPClient extends SimpleProtocolClient {
 
@@ -56,7 +58,7 @@ public class SimpleProtocolTCPClient extends SimpleProtocolClient {
 		commandString.append(protocol + ":" + command);
 		if (parameter != null) {
 			for (int i = 0; i < parameter.length; i++) {
-				commandString.append(" ");
+				commandString.append(PCP.PARAMETER_DELIMITER);
 				commandString.append(parameter[i]);
 				
 			}

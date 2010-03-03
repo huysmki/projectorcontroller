@@ -7,6 +7,8 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+import be.rhea.remote.PCP;
+
 
 public class SimpleProtocolUDPClient extends SimpleProtocolClient {
 
@@ -52,7 +54,7 @@ public class SimpleProtocolUDPClient extends SimpleProtocolClient {
 		commandString.append(command);
 		if (parameter != null) {
 			for (int i = 0; i < parameter.length; i++) {
-				commandString.append(" ");
+				commandString.append(PCP.PARAMETER_DELIMITER);
 				commandString.append(parameter[i]);
 				
 			}
