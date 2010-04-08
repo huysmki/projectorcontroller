@@ -1,5 +1,6 @@
 package be.rhea.projector.controller.server.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -17,6 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
 import be.rhea.projector.controller.client.ui.ClientPanel;
@@ -45,21 +47,25 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 	private String mediaDir;
 
 	public PlayerPanel(Scenario scenario) {
-		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+		this.setLayout(new BorderLayout());
 		if (scenario != null) {
+			JPanel panel = new JPanel(); 
+			panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 			mediaDir = StatusHolder.getInstance().getMediaDir();
 			mediaDir = JOptionPane.showInputDialog(this, "Please provide media directory : ", mediaDir);
 
 			StatusHolder.getInstance().setMediaDir(mediaDir);
 
 			JScrollPane createPlayersPanel = createPlayersPanel(scenario);
-			this.add(createPlayersPanel);
+			panel.add(createPlayersPanel);
 			
 			JScrollPane midPanel = createPauseStopPanel();
-			this.add(midPanel);
+			panel.add(midPanel);
+			this.add(panel, BorderLayout.CENTER);
 			
-			JScrollPane createClientPanelPreviewPanel = createClientPanelPreviewPanel(scenario);
-			this.add(createClientPanelPreviewPanel);
+			//JScrollPane createClientPanelPreviewPanel = createClientPanelPreviewPanel(scenario);
+			JToolBar createClientPanelPreviewPanel = createClientPanelPreviewToolbar(scenario);
+			this.add(createClientPanelPreviewPanel, BorderLayout.PAGE_END);
 			
 			ScenarioPlayer.addStateChangeListener(this);
 			ScenarioPlayer.setScenario(scenario);
@@ -84,9 +90,10 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 	}
 
 	private JScrollPane createPauseStopPanel() {
-		JPanel midPanel = new JPanel(); 
-		midPanel.setLayout(new BoxLayout(midPanel, BoxLayout.Y_AXIS));
-		midPanel.add(Box.createRigidArea(new Dimension(0,50)));
+		JPanel startStopPanel = new JPanel(); 
+		startStopPanel.setLayout(new BoxLayout(startStopPanel, BoxLayout.Y_AXIS));
+//		startStopPanel.add(Box.createRigidArea(new Dimension(0,50)));
+		startStopPanel.add(Box.createVerticalGlue());
 
 		JPanel stopPausePanel = new JPanel();
 		stopPausePanel.setLayout(new BoxLayout(stopPausePanel, BoxLayout.X_AXIS));
@@ -117,21 +124,22 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 		stopPausePanel.add(stopButton);
 		stopPausePanel.add(Box.createHorizontalGlue());
 
-		midPanel.add(stopPausePanel);
+		startStopPanel.add(stopPausePanel);
 
-		midPanel.add(Box.createRigidArea(new Dimension(0,30)));
+		startStopPanel.add(Box.createRigidArea(new Dimension(0,30)));
 		
-		JPanel testPanel = new JPanel();
-		testPanel.setLayout(new BoxLayout(testPanel, BoxLayout.X_AXIS));
+		JPanel labelPanel = new JPanel();
+		labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.X_AXIS));
 		statusLabel = new JLabel("");
 		statusLabel.setAlignmentX(LEFT_ALIGNMENT);
 		statusLabel.setFont(new Font("Arial", Font.PLAIN, 20));
-		testPanel.add(statusLabel);
-		testPanel.setAlignmentX(CENTER_ALIGNMENT);
-		midPanel.add(testPanel);
+		labelPanel.add(statusLabel);
+		labelPanel.setAlignmentX(CENTER_ALIGNMENT);
+		startStopPanel.add(labelPanel);
 		
+		startStopPanel.add(Box.createVerticalGlue());
 		
-		JScrollPane scrollPane = new JScrollPane(midPanel);
+		JScrollPane scrollPane = new JScrollPane(startStopPanel);
 		return scrollPane;
 	}
 
@@ -173,6 +181,48 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 		JScrollPane scrollPane2 = new JScrollPane(overviewClientsPanel);
 		return scrollPane2;
 	}
+	
+	private JToolBar createClientPanelPreviewToolbar(Scenario scenario) {
+		JToolBar overviewClientsToolbar = new JToolBar();
+		overviewClientsToolbar.setRollover(true);
+		List<Client> clients = scenario.getClients();
+		for (Client client : clients) {
+			JPanel panel = new JPanel();
+			panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+			JLabel label = new JLabel(client.getName());
+			label.setAlignmentX(CENTER_ALIGNMENT);
+			panel.add(label);
+			if (client.getType() == ClientType.PROJECTOR) {
+				try {
+					ClientPanel clientPanel = new ClientPanel(mediaDir, client.getPort());
+					clientPanel.setPreferredSize(new Dimension(200,150));
+					clientPanel.setMinimumSize(new Dimension(200,150));
+					clientPanel.setMaximumSize(new Dimension(200,150));
+					clientPanel.setAlignmentX(CENTER_ALIGNMENT);
+					panel.add(clientPanel);
+					clientPanels.add(clientPanel);
+				} catch (IOException e) {
+					ProjectorControllerServer.showError(e);
+				}
+			} else if (client.getType() == ClientType.ARTNET) {
+				ArtNetPreviewer artNetPreviewer;
+				try {
+					artNetPreviewer = new ArtNetPreviewer(client.getPort());
+					artNetPreviewer.setPreferredSize(new Dimension(200,150));
+					artNetPreviewer.setMinimumSize(new Dimension(200,150));
+					artNetPreviewer.setMaximumSize(new Dimension(200,150));				
+					artNetPreviewer.setAlignmentX(CENTER_ALIGNMENT);
+					panel.add(artNetPreviewer);
+					artNetPanels.add(artNetPreviewer);
+				} catch (IOException e) {
+					ProjectorControllerServer.showError(e);
+				}			
+			}
+			overviewClientsToolbar.add(panel);
+			overviewClientsToolbar.addSeparator(new Dimension(5,5));
+		}
+		return overviewClientsToolbar;
+	}	
 	
 	public void stopMediaPanels() {
 		for (ClientPanel clientPanel : clientPanels) {
