@@ -7,7 +7,6 @@ import java.awt.event.MouseListener;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JMenuItem;
@@ -22,8 +21,6 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-
-import sun.print.resources.serviceui_zh_TW;
 
 import be.rhea.projector.controller.server.ProjectorControllerServer;
 import be.rhea.projector.controller.server.annotation.EditableProperty;
@@ -59,12 +56,15 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 	private static final String DUPLICATE = "DUPLICATE";
 	private static final String ADD_SCENE = "ADD_SCENE";
 	private static final String ADD_SCENEPART = "ADD_SCENEPART";
+	private static final String COPY = "COPY";
+	private static final String PASTE = "PASTE";
 	private final BeanEditor beanEditor;
 	private DefaultMutableTreeNode clientsItem;
 	private Object selectedObject;
 	private DefaultMutableTreeNode sceneItem;
 	private DefaultMutableTreeNode selectedTreeNode;
 	private List<DefaultMutableTreeNode> selectedTreeNodeList;
+	private List<DefaultMutableTreeNode> copiedTreeNodeList;
 
 	public ScenarioViewer(BeanEditor beanEditor) {
 		this.beanEditor = beanEditor;
@@ -215,6 +215,20 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 
 			addRemoveMenuItem(popupMenu);			
 			addMoveUpDownMenuItems(popupMenu);
+		}
+		if (selectedTreeNodeList.size() > 0) {
+			JMenuItem copyItem = new JMenuItem("Copy");
+			copyItem.setActionCommand(COPY);
+			copyItem.addActionListener(this);
+			popupMenu.add(copyItem);
+
+			if (copiedTreeNodeList != null) {
+				JMenuItem pasteItem = new JMenuItem("Paste");
+				pasteItem.setActionCommand(PASTE);
+				pasteItem.addActionListener(this);
+				popupMenu.add(pasteItem);
+			}
+			
 		}
 	
 	}
@@ -484,6 +498,30 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 				}					
 			}
 			setTreeNodeAsSelected(newScenePartNode);
+		} else if (COPY.equals(event.getActionCommand())) {
+			if (selectedTreeNodeList.size() > 0) {
+				copiedTreeNodeList = new ArrayList<DefaultMutableTreeNode>();
+				for (DefaultMutableTreeNode treeNode : selectedTreeNodeList) {
+					Object clonedObject = clone(treeNode.getUserObject());
+					DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(clonedObject);
+					copiedTreeNodeList.add(newNode);
+				}
+			} 
+		} else if (PASTE.equals(event.getActionCommand())) {
+			if (selectedTreeNodeList.size() > 0 && copiedTreeNodeList != null) {
+				DefaultMutableTreeNode lastElement = selectedTreeNodeList.get(selectedTreeNodeList.size() - 1);
+				DefaultMutableTreeNode parent = (DefaultMutableTreeNode) lastElement.getParent();
+				int index = parent.getIndex(lastElement);
+				for (DefaultMutableTreeNode treeNode : copiedTreeNodeList) {
+					parent.insert(treeNode, ++index);
+					DefaultTreeModel model = (DefaultTreeModel) this.getModel();
+					if (model != null) {
+						model.nodeStructureChanged(parent);
+					}					
+
+				}
+			}
+			copiedTreeNodeList = null;
 		}
 	}
 
