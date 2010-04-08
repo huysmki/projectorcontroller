@@ -7,6 +7,7 @@ import java.awt.event.MouseListener;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JMenuItem;
@@ -20,6 +21,9 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
+
+import sun.print.resources.serviceui_zh_TW;
 
 import be.rhea.projector.controller.server.ProjectorControllerServer;
 import be.rhea.projector.controller.server.annotation.EditableProperty;
@@ -60,6 +64,7 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 	private Object selectedObject;
 	private DefaultMutableTreeNode sceneItem;
 	private DefaultMutableTreeNode selectedTreeNode;
+	private List<DefaultMutableTreeNode> selectedTreeNodeList;
 
 	public ScenarioViewer(BeanEditor beanEditor) {
 		this.beanEditor = beanEditor;
@@ -339,45 +344,109 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 				setTreeNodeAsSelected(newActionNode);
 			}
 		} else if (MOVE_DOWN.equals(event.getActionCommand())) {
-			DefaultMutableTreeNode backupTreeNode = selectedTreeNode;
-			DefaultMutableTreeNode parent = (DefaultMutableTreeNode) selectedTreeNode.getParent();
-			int index = parent.getIndex(selectedTreeNode);
-			parent.remove(index);
-			parent.insert(selectedTreeNode, index + 1);
-			DefaultTreeModel model = (DefaultTreeModel) this.getModel();
-			if (model != null) {
-				model.nodeStructureChanged(parent);
-			}		
-			setTreeNodeAsSelected(backupTreeNode);
+			if (selectedTreeNodeList.size() > 0) {
+				DefaultMutableTreeNode lastElement = selectedTreeNodeList.get(selectedTreeNodeList.size() - 1);
+				if (lastElement.getParent().getIndex(lastElement) < lastElement.getParent().getChildCount() - 1) {
+					List<DefaultMutableTreeNode> selectedTreeNodesListBackup = new ArrayList<DefaultMutableTreeNode>(selectedTreeNodeList);
+					DefaultMutableTreeNode[] selectedTreeNodesArray = selectedTreeNodesListBackup.toArray(new DefaultMutableTreeNode[0]);
+					for (int i = selectedTreeNodesArray.length - 1; i >= 0; i--) {
+						DefaultMutableTreeNode treeNode = selectedTreeNodesArray[i];
+						DefaultMutableTreeNode parent = (DefaultMutableTreeNode) treeNode.getParent();
+						int index = parent.getIndex(treeNode);
+						parent.remove(index);
+						parent.insert(treeNode, index + 1);
+						DefaultTreeModel model = (DefaultTreeModel) this.getModel();
+						if (model != null) {
+							model.nodeStructureChanged(parent);
+						}					
+					}
+					setTreeNodesAsSelected(selectedTreeNodesListBackup);
+					
+				}
+			} else {
+				DefaultMutableTreeNode backupTreeNode = selectedTreeNode;
+				DefaultMutableTreeNode parent = (DefaultMutableTreeNode) selectedTreeNode.getParent();
+				int index = parent.getIndex(selectedTreeNode);
+				parent.remove(index);
+				parent.insert(selectedTreeNode, index + 1);
+				DefaultTreeModel model = (DefaultTreeModel) this.getModel();
+				if (model != null) {
+					model.nodeStructureChanged(parent);
+				}		
+				setTreeNodeAsSelected(backupTreeNode);
+			}
 			
 		} else if (MOVE_UP.equals(event.getActionCommand())) {
-			DefaultMutableTreeNode backupTreeNode = selectedTreeNode;
-			DefaultMutableTreeNode parent = (DefaultMutableTreeNode) selectedTreeNode.getParent();
-			int index = parent.getIndex(selectedTreeNode);
-			parent.remove(index);
-			parent.insert(selectedTreeNode, index - 1);
-			DefaultTreeModel model = (DefaultTreeModel) this.getModel();
-			if (model != null) {
-				model.nodeStructureChanged(parent);
-			}					
-			setTreeNodeAsSelected(backupTreeNode);
-
+			if (selectedTreeNodeList.size() > 0) {
+				DefaultMutableTreeNode firstElement = selectedTreeNodeList.get(0);
+				if (firstElement.getParent().getIndex(firstElement) > 0) {
+					List<DefaultMutableTreeNode> selectedTreeNodesListBackup = new ArrayList<DefaultMutableTreeNode>(selectedTreeNodeList);
+					for (DefaultMutableTreeNode treeNode : selectedTreeNodesListBackup) {
+						DefaultMutableTreeNode parent = (DefaultMutableTreeNode) treeNode.getParent();
+						int index = parent.getIndex(treeNode);
+						parent.remove(index);
+						parent.insert(treeNode, index - 1);
+						DefaultTreeModel model = (DefaultTreeModel) this.getModel();
+						if (model != null) {
+							model.nodeStructureChanged(parent);
+						}					
+					}
+					setTreeNodesAsSelected(selectedTreeNodesListBackup);
+					
+				}
+			} else {
+				DefaultMutableTreeNode backupTreeNode = selectedTreeNode;
+				DefaultMutableTreeNode parent = (DefaultMutableTreeNode) selectedTreeNode.getParent();
+				int index = parent.getIndex(selectedTreeNode);
+				parent.remove(index);
+				parent.insert(selectedTreeNode, index - 1);
+				DefaultTreeModel model = (DefaultTreeModel) this.getModel();
+				if (model != null) {
+					model.nodeStructureChanged(parent);
+				}					
+				setTreeNodeAsSelected(backupTreeNode);
+			}
 		} else if (REMOVE.equals(event.getActionCommand())) {
 			if (JOptionPane.showConfirmDialog(null, "Are you sure?", "Delete", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
 				DefaultTreeModel model = (DefaultTreeModel) this.getModel();
-				model.removeNodeFromParent(selectedTreeNode);
+				if (selectedTreeNodeList.size() > 0) {
+					for (DefaultMutableTreeNode treeNode : selectedTreeNodeList) {
+						model.removeNodeFromParent(treeNode);
+					}
+				} else {
+					model.removeNodeFromParent(selectedTreeNode);
+				}
 			}
 		} else if (DUPLICATE.equals(event.getActionCommand())) {
-			Object clonedObject = clone(selectedObject);
-			DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(clonedObject);
-			DefaultMutableTreeNode parent = (DefaultMutableTreeNode)selectedTreeNode.getParent();
-			int index = parent.getIndex(selectedTreeNode);
-			parent.insert(newNode, index + 1);
-			DefaultTreeModel model = (DefaultTreeModel) this.getModel();
-			if (model != null) {
-				model.nodeStructureChanged(parent);
-			}					
-			setTreeNodeAsSelected(newNode);
+			if (selectedTreeNodeList.size() > 0) {
+				List<DefaultMutableTreeNode> duplicatedTreeNodes = new ArrayList<DefaultMutableTreeNode>();
+				DefaultMutableTreeNode lastElement = selectedTreeNodeList.get(selectedTreeNodeList.size() - 1);
+				int lastIndex = lastElement.getParent().getIndex(lastElement);
+				for (DefaultMutableTreeNode treeNode : selectedTreeNodeList) {
+					DefaultMutableTreeNode parent = (DefaultMutableTreeNode)treeNode.getParent();
+					Object clonedObject = clone(treeNode.getUserObject());
+					DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(clonedObject);
+					duplicatedTreeNodes.add(newNode);
+					parent.insert(newNode, ++lastIndex);
+					DefaultTreeModel model = (DefaultTreeModel) this.getModel();
+					if (model != null) {
+						model.nodeStructureChanged(parent);
+					}					
+				}
+				setTreeNodesAsSelected(duplicatedTreeNodes);
+
+			} else {
+				Object clonedObject = clone(selectedObject);
+				DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(clonedObject);
+				DefaultMutableTreeNode parent = (DefaultMutableTreeNode)selectedTreeNode.getParent();
+				int index = parent.getIndex(selectedTreeNode);
+				parent.insert(newNode, index + 1);
+				DefaultTreeModel model = (DefaultTreeModel) this.getModel();
+				if (model != null) {
+					model.nodeStructureChanged(parent);
+				}					
+				setTreeNodeAsSelected(newNode);
+			}
 
 		} else if (ADD_SCENE.equals(event.getActionCommand())) {
 			DefaultMutableTreeNode newSceneNode = new DefaultMutableTreeNode(new Scene());
@@ -455,12 +524,43 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 		this.scrollPathToVisible(treePath);
 	}
 
+	private void setTreeNodesAsSelected(List<DefaultMutableTreeNode> nodes) {
+		TreePath[] treePaths = new TreePath[nodes.size()];
+		int index = 0;
+		for (DefaultMutableTreeNode node : nodes) {
+			TreePath treePath = new TreePath(node.getPath());
+			treePaths[index++] = treePath;
+		}
+		
+		this.setSelectionPaths(treePaths);
+		this.scrollPathToVisible(treePaths[0]);
+	}
+
 	public void valueChanged(TreeSelectionEvent event) {
 		beanEditor.stopEditing();
 		DefaultTreeModel model = (DefaultTreeModel) this.getModel();
 		if (model != null && selectedTreeNode != null) {
 			model.nodeChanged(selectedTreeNode);
 		}
+		
+		TreePath[] paths = this.getSelectionPaths();
+		this.getSelectionModel().setSelectionMode(TreeSelectionModel.CONTIGUOUS_TREE_SELECTION);
+		if (paths != null) {
+			selectedTreeNodeList = new ArrayList<DefaultMutableTreeNode>();
+			for (int i = 0; i < paths.length; i++) {
+				TreePath treePath = paths[i];
+				DefaultMutableTreeNode lastPathComponent = (DefaultMutableTreeNode)treePath.getLastPathComponent();
+				Object userObject = lastPathComponent.getUserObject();
+				if (! (userObject instanceof AbstractAction)) {
+					this.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+					selectedTreeNodeList.clear();
+					break;
+				} else {
+					selectedTreeNodeList.add(lastPathComponent);
+				}
+			}
+		}
+		
 		TreePath selectionPath = event.getNewLeadSelectionPath();
 		if (selectionPath != null) {
 			Object lastPathComponent = selectionPath.getLastPathComponent();
