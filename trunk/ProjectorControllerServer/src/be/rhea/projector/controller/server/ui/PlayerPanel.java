@@ -239,9 +239,9 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 		playPanel.add(Box.createRigidArea(new Dimension(5,0)));
 		JLabel label = new JLabel(scene.getName());
 		label.setFont(new Font("Arial", Font.PLAIN, 25));
-		label.setPreferredSize(new Dimension(300,50));
-		label.setMinimumSize(new Dimension(300,50));
-		label.setMaximumSize(new Dimension(300,50));
+		label.setPreferredSize(new Dimension(600,50));
+		label.setMinimumSize(new Dimension(100,50));
+		label.setMaximumSize(new Dimension(600,50));
 		label.setAlignmentX(LEFT_ALIGNMENT);
 		playPanel.add(label);
 		playPanel.add(Box.createHorizontalGlue());

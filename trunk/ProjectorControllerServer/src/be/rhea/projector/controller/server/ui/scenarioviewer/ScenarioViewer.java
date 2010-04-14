@@ -221,14 +221,13 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 			copyItem.setActionCommand(COPY);
 			copyItem.addActionListener(this);
 			popupMenu.add(copyItem);
-
-			if (copiedTreeNodeList != null) {
-				JMenuItem pasteItem = new JMenuItem("Paste");
-				pasteItem.setActionCommand(PASTE);
-				pasteItem.addActionListener(this);
-				popupMenu.add(pasteItem);
-			}
 			
+		}
+		if ((selectedObject instanceof AbstractAction || selectedObject instanceof ScenePart) && copiedTreeNodeList != null) {
+			JMenuItem pasteItem = new JMenuItem("Paste");
+			pasteItem.setActionCommand(PASTE);
+			pasteItem.addActionListener(this);
+			popupMenu.add(pasteItem);
 		}
 	
 	}
@@ -508,12 +507,23 @@ public class ScenarioViewer extends JTree implements MouseListener, ActionListen
 				}
 			} 
 		} else if (PASTE.equals(event.getActionCommand())) {
-			if (selectedTreeNodeList.size() > 0 && copiedTreeNodeList != null) {
+			if (selectedObject instanceof AbstractAction && copiedTreeNodeList != null) {
 				DefaultMutableTreeNode lastElement = selectedTreeNodeList.get(selectedTreeNodeList.size() - 1);
 				DefaultMutableTreeNode parent = (DefaultMutableTreeNode) lastElement.getParent();
 				int index = parent.getIndex(lastElement);
 				for (DefaultMutableTreeNode treeNode : copiedTreeNodeList) {
 					parent.insert(treeNode, ++index);
+					DefaultTreeModel model = (DefaultTreeModel) this.getModel();
+					if (model != null) {
+						model.nodeStructureChanged(parent);
+					}					
+
+				}
+			} else if (selectedObject instanceof ScenePart && copiedTreeNodeList != null) {
+				DefaultMutableTreeNode parent = selectedTreeNode;
+				int index = 0;
+				for (DefaultMutableTreeNode treeNode : copiedTreeNodeList) {
+					parent.insert(treeNode, index++);
 					DefaultTreeModel model = (DefaultTreeModel) this.getModel();
 					if (model != null) {
 						model.nodeStructureChanged(parent);
