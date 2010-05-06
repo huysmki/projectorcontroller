@@ -42,7 +42,7 @@ public class ProjectorControllerClient {
 
 	private static void createAndShowGUI(int port, String mediaDir)
 			throws IOException {
-		JFrame frame = new JFrame("Media Tester");
+		JFrame frame = new JFrame("Projector Client on port " + port);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		FrameMouseListener frameMouseListener = new FrameMouseListener(frame);
 		frame.addMouseListener(frameMouseListener);
