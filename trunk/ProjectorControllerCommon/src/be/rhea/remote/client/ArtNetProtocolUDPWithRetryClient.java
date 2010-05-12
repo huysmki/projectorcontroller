@@ -27,7 +27,7 @@ public class ArtNetProtocolUDPWithRetryClient {
 	
 	private class UdpMessagSenderThread implements Runnable {
 
-		private static final int SLEEP_TIME_BETWEEN_SEND_REQUESTS = 200;
+		private static final int SLEEP_TIME_BETWEEN_SEND_REQUESTS = 50;
 		private final List<Integer> data;
 		public UdpMessagSenderThread(List<Integer> data) {
 			this.data = data;

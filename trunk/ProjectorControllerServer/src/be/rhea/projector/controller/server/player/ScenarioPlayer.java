@@ -84,17 +84,24 @@ public class ScenarioPlayer implements Runnable {
 		}
 		isPaused = false;
 		isPlaying = false;
+		List<Integer> artNetData = new ArrayList<Integer>();
+		for (int i = 0; i < 512; i++) {
+			artNetData.add(new Integer(0));
+		}
+		
 		List<Client> clients = scenarioToPlay.getClients();
 		for (Client client : clients) {
 			if (client.getType() == ClientType.PROJECTOR) {
 				sendSimpleProtocolCommand(client, PCP.STOP, null);
+			} else if (client.getType() == ClientType.ARTNET) {
+				sendArtNetCommand(client, artNetData);
 			}
 		}
 		fireStateChangeListeners(new StateChangedEvent(State.STOP));
 		return true;
 	}
 
-	private Client getClientForId(List<Client> clients, int clientId) {
+	private static Client getClientForId(List<Client> clients, int clientId) {
 		for (Client client : clients) {
 			if (client.getId() == clientId) {
 				return client;
@@ -118,7 +125,7 @@ public class ScenarioPlayer implements Runnable {
 		}
 	}
 	
-	private void sendArtNetCommand(Client client, List<Integer> data) {
+	private static void sendArtNetCommand(Client client, List<Integer> data) {
 		try {
 			//System.out.println("Send ArtNet package to " + client.getHost() + ":" + client.getPort());
 			ArtNetProtocolUDPWithRetryClient socketClient = new ArtNetProtocolUDPWithRetryClient(client.getHost(), client.getPort());
@@ -157,14 +164,18 @@ public class ScenarioPlayer implements Runnable {
 							return;
 						}						
 					}
+					fireStateChangeListeners(new StateChangedEvent(State.ACTION_EXECUTED, action));
 					String command = action.getCommand();
 					if (action instanceof SleepAction) {
-						try {
-							Thread.sleep(((SleepAction)action).getTime());
-						} catch (InterruptedException e) {
-							ProjectorControllerServer.showError(e);
+						int time = ((SleepAction)action).getTime();
+						long now = System.currentTimeMillis();
+						while (isPlaying && System.currentTimeMillis() < (now + time)) {
+							try {
+								Thread.sleep(100);
+							} catch (InterruptedException e) {
+								ProjectorControllerServer.showError(e);
+							}
 						}
-						
 					} else if (action instanceof ManualAcknownledgeAction) {
 						ManualAcknownledgeAction manualAcknowledgeAction = (ManualAcknownledgeAction) action; 
 						String message = manualAcknowledgeAction.getMessage()!= null?manualAcknowledgeAction.getMessage():"Please Aknowledge";
@@ -207,5 +218,23 @@ public class ScenarioPlayer implements Runnable {
 		for (StateChangedListener listener : stateChangeListeners) {
 			listener.stateChanged(event);
 		}
+	}
+
+	public static void playActions(List<AbstractAction> actionList) {
+		List<Client> clients = scenarioToPlay.getClients();
+		for (AbstractAction action : actionList) {
+			String command = action.getCommand();
+			if (action instanceof ArtNetAction) {
+				int clientId = ((AbstractArtNetClientAction) action).getClientId();
+				Client client = getClientForId(clients, clientId);
+				sendArtNetCommand(client, ((ArtNetAction)action).getValues());
+			} else if (action instanceof AbstractProjectorClientAction){
+				int clientId = ((AbstractProjectorClientAction) action).getClientId();
+				Client client = getClientForId(clients, clientId);
+				sendSimpleProtocolCommand(client, command, action.getParameters());
+			}	
+			fireStateChangeListeners(new StateChangedEvent(State.ACTION_EXECUTED, action));
+		}
+		
 	}
 }
