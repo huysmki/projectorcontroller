@@ -5,21 +5,32 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.AbstractListModel;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 
 import be.rhea.projector.controller.client.ui.ClientPanel;
 import be.rhea.projector.controller.server.ProjectorControllerServer;
@@ -31,6 +42,7 @@ import be.rhea.projector.controller.server.scenario.Client;
 import be.rhea.projector.controller.server.scenario.ClientType;
 import be.rhea.projector.controller.server.scenario.Scenario;
 import be.rhea.projector.controller.server.scenario.Scene;
+import be.rhea.projector.controller.server.scenario.actions.AbstractAction;
 import be.rhea.projector.controller.server.ui.artnet.ArtNetPreviewer;
 import be.rhea.projector.controller.server.util.StatusHolder;
 
@@ -45,6 +57,7 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 	private JButton pauseButton;
 	private JLabel statusLabel;
 	private String mediaDir;
+	private JList loggingList;
 
 	public PlayerPanel(Scenario scenario) {
 		this.setLayout(new BorderLayout());
@@ -59,8 +72,17 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 			JScrollPane createPlayersPanel = createPlayersPanel(scenario);
 			panel.add(createPlayersPanel);
 			
-			JScrollPane midPanel = createPauseStopPanel();
-			panel.add(midPanel);
+			JPanel rightPanel = new JPanel(new BorderLayout());
+			
+			JScrollPane pauseStopPanel = createPauseStopPanel();
+			rightPanel.add(pauseStopPanel, BorderLayout.NORTH);
+			
+			JScrollPane loggingPanel = createLoggingPanel();
+			rightPanel.add(loggingPanel, BorderLayout.CENTER);
+			
+			panel.add(rightPanel);
+			
+			
 			this.add(panel, BorderLayout.CENTER);
 			
 			//JScrollPane createClientPanelPreviewPanel = createClientPanelPreviewPanel(scenario);
@@ -75,6 +97,60 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 					JOptionPane.showMessageDialog(null, "No scenario available.", "Error", JOptionPane.ERROR_MESSAGE);
 				}});
 		}
+	}
+
+	private JScrollPane createLoggingPanel() {
+		final DefaultListModel defaultListModel = new DefaultListModel();
+
+		loggingList = new JList(defaultListModel);
+
+		defaultListModel.addListDataListener(new ListDataListener() {
+			
+			public void intervalRemoved(ListDataEvent arg0) {
+			}
+			
+			public void intervalAdded(ListDataEvent arg0) {
+				try {
+					if (defaultListModel.getSize() > 0) {
+						loggingList.ensureIndexIsVisible(defaultListModel.getSize() - 1);
+					}
+				} catch (Exception e) {
+				}
+			}
+			
+			public void contentsChanged(ListDataEvent arg0) {
+			}
+		});		
+		
+		loggingList.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent event) {
+				super.mousePressed(event);
+				if (event.getButton() == MouseEvent.BUTTON3 && loggingList.getSelectedValues().length > 0) {
+					JPopupMenu popupMenu = new JPopupMenu();
+					JMenuItem menuItem = new JMenuItem("Execute Actions");
+					popupMenu.add(menuItem);
+					popupMenu.show(loggingList, event.getX(), event.getY());
+					menuItem.addActionListener(new ActionListener() {
+						
+						public void actionPerformed(ActionEvent event) {
+							 Object[] selectedValues = loggingList.getSelectedValues();
+							 List<AbstractAction> actionsList = new ArrayList<AbstractAction>();
+							 for (int i = 0; i < selectedValues.length; i++) {
+								AbstractAction action = (AbstractAction) selectedValues[i];
+								actionsList.add(action);
+							 }
+							 
+							 ScenarioPlayer.playActions(actionsList);
+						}
+					});
+				}
+			}
+		});
+
+		JScrollPane loggingPanel = new JScrollPane(loggingList);
+		
+		return loggingPanel;
 	}
 
 	private JScrollPane createPlayersPanel(Scenario scenario) {
@@ -262,6 +338,7 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 
 	public void actionPerformed(ActionEvent actionEvent) {
 		if (actionEvent.getActionCommand().startsWith(PLAY)) {
+			((DefaultListModel)loggingList.getModel()).clear();
 			if (ScenarioPlayer.isPlaying()) {
 				ScenarioPlayer.stop();
 			}
@@ -292,6 +369,36 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 			statusLabel.setText("Paused");
 		} else if (e.getNewState().equals(State.MANUAL_ACKNOWLEDGE)) {
 			statusLabel.setText("Pause : " + e.getMessage());
-		} 
-	}	
+		} else if (e.getNewState().equals(State.ACTION_EXECUTED)) {
+			((DefaultListModel)loggingList.getModel()).addElement(e.getAction());
+		}
+	}
+	
+//	private class LoggingListModel extends AbstractListModel {
+//		
+//		private static final long serialVersionUID = 1L;
+//		ArrayList<AbstractAction> executedActions = new ArrayList<AbstractAction>();
+//
+//		public Object getElementAt(int index) {
+//			return executedActions.get(index);
+//		}
+//
+//		public void clearAll() {
+//			int changedindex = executedActions.size() - 1;
+//			executedActions.clear();
+//			fireContentsChanged(this, 0, changedindex);
+//		}
+//
+//		public void add(AbstractAction action) {
+//			executedActions.add(action);
+//			int changedindex = executedActions.size() - 1;
+//			fireIntervalAdded(this, changedindex, changedindex);
+//			
+//		}
+//
+//		public int getSize() {
+//			return executedActions.size();
+//		}
+//		
+//	}
 }
