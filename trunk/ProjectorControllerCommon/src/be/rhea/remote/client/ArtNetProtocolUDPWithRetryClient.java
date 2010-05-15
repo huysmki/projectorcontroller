@@ -24,6 +24,8 @@ public class ArtNetProtocolUDPWithRetryClient {
 			UnknownHostException, IOException {
 
 		DatagramSocket datagramSocket = new DatagramSocket();
+		datagramSocket.setTrafficClass(0x04);
+		datagramSocket.setBroadcast(true);		
 		InetAddress a = InetAddress.getByName(host);
 		byte[] inetaddress = a.getAddress();
 
@@ -62,6 +64,8 @@ public class ArtNetProtocolUDPWithRetryClient {
 			}
 			datagramSocket.send(packet);
 		}
+		datagramSocket.disconnect();
+		datagramSocket.close();
 	}
 	
 	public void setSendRetryTimes(int sendRetryTimes) {
