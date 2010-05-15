@@ -17,6 +17,7 @@ public class SimpleProtocolUDPWithRetryClient extends SimpleProtocolClient {
 	private final String protocol;
 	private int sendRetryTimes = 1;
 	private int waitTimeBetweenRetries = 20;
+	private DatagramSocket datagramSocket;
 
 	public SimpleProtocolUDPWithRetryClient(String host, int port, String protocol) {
 		this.port = port;
@@ -26,6 +27,9 @@ public class SimpleProtocolUDPWithRetryClient extends SimpleProtocolClient {
 
 	@Override
 	public void connect() throws IOException {
+		datagramSocket = new DatagramSocket();
+		datagramSocket.setTrafficClass(0x04);
+		datagramSocket.setBroadcast(true);
 	}
 
 	@Override
@@ -39,7 +43,6 @@ public class SimpleProtocolUDPWithRetryClient extends SimpleProtocolClient {
 
 	private void sendData(String data) throws SocketException,
 			UnknownHostException, IOException {
-		DatagramSocket datagramSocket = new DatagramSocket();
 		InetAddress a = InetAddress.getByName(host);
 	    byte[] inetaddress = a.getAddress();
 	    
@@ -80,6 +83,8 @@ public class SimpleProtocolUDPWithRetryClient extends SimpleProtocolClient {
 
 	@Override
 	public void disconnect() throws IOException {
+		datagramSocket.disconnect();
+		datagramSocket.close();
 	}
 
 	public void setSendRetryTimes(int sendRetryTimes) {
