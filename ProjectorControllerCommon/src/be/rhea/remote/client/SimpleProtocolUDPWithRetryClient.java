@@ -15,7 +15,8 @@ public class SimpleProtocolUDPWithRetryClient extends SimpleProtocolClient {
 	private int port;
 	private String host;
 	private final String protocol;
-	private static final int SLEEP_TIME_BETWEEN_SEND_REQUESTS = 20;
+	private int sendRetryTimes = 1;
+	private int waitTimeBetweenRetries = 20;
 
 	public SimpleProtocolUDPWithRetryClient(String host, int port, String protocol) {
 		this.port = port;
@@ -44,11 +45,14 @@ public class SimpleProtocolUDPWithRetryClient extends SimpleProtocolClient {
 	    
 		DatagramPacket packet = new DatagramPacket(data.getBytes(), data.length(), InetAddress.getByAddress(inetaddress), port);
 		datagramSocket.send(packet);
-		try {
-			Thread.sleep(SLEEP_TIME_BETWEEN_SEND_REQUESTS);
-		} catch (InterruptedException e) {
+		for (int i = 1; i < sendRetryTimes; i++)
+		{
+			try {
+				Thread.sleep(waitTimeBetweenRetries);
+			} catch (InterruptedException e) {
+			}
+			datagramSocket.send(packet);
 		}
-		datagramSocket.send(packet);
 	}
 
 	@Override
@@ -77,4 +81,13 @@ public class SimpleProtocolUDPWithRetryClient extends SimpleProtocolClient {
 	@Override
 	public void disconnect() throws IOException {
 	}
+
+	public void setSendRetryTimes(int sendRetryTimes) {
+		this.sendRetryTimes = sendRetryTimes;
+	}
+
+	public void setWaitTimeBetweenRetries(int waitTimeBetweenRetries) {
+		this.waitTimeBetweenRetries = waitTimeBetweenRetries;
+	}
+
 }

@@ -113,10 +113,10 @@ public class ScenarioPlayer implements Runnable {
 	private static void sendSimpleProtocolCommand(Client client, String command, String[] parameters) {
 		
 		try {
-//			//System.out.println("Send command " + command + " to " + client.getHost() + ":" + client.getPort());
-//			SimpleProtocolTCPClient socketClient = new SimpleProtocolTCPClient(client.getHost(), client.getPort(), PCP.PROTOCOL);
-//			SimpleProtocolClient socketClient = new SimpleProtocolUDPClient(client.getHost(), client.getPort(), PCP.PROTOCOL);
 			SimpleProtocolClient socketClient = new SimpleProtocolUDPWithRetryClient(client.getHost(), client.getPort(), PCP.PROTOCOL);
+			((SimpleProtocolUDPWithRetryClient)socketClient).setSendRetryTimes(client.getSendRetryTimes());
+			((SimpleProtocolUDPWithRetryClient)socketClient).setWaitTimeBetweenRetries(client.getWaitTimeBetweenRetries());
+
 			socketClient.connect();
 			socketClient.sendCommand(command, parameters);
 			socketClient.disconnect();
@@ -128,8 +128,10 @@ public class ScenarioPlayer implements Runnable {
 	private static void sendArtNetCommand(Client client, List<Integer> data) {
 		try {
 			//System.out.println("Send ArtNet package to " + client.getHost() + ":" + client.getPort());
-			ArtNetProtocolUDPWithRetryClient socketClient = new ArtNetProtocolUDPWithRetryClient(client.getHost(), client.getPort());
-			socketClient.sendData(data);
+			ArtNetProtocolUDPWithRetryClient artNetClient = new ArtNetProtocolUDPWithRetryClient(client.getHost(), client.getPort());
+			artNetClient.setSendRetryTimes(client.getSendRetryTimes());
+			artNetClient.setWaitTimeBetweenRetries(client.getWaitTimeBetweenRetries());
+			artNetClient.sendData(data);
 		} catch (IOException e) {
 			ProjectorControllerServer.showError(e);
 		}
