@@ -1,6 +1,7 @@
 package be.rhea.projector.controller.server.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -313,18 +314,32 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 		JPanel playPanel = new JPanel();
 		playPanel.setLayout(new BoxLayout(playPanel, BoxLayout.X_AXIS));
 		playPanel.add(Box.createRigidArea(new Dimension(5,0)));
-		JLabel label = new JLabel(scene.getName());
+		final JLabel label = new JLabel(scene.getName());
 		label.setFont(new Font("Arial", Font.PLAIN, 25));
 		label.setPreferredSize(new Dimension(600,50));
 		label.setMinimumSize(new Dimension(100,50));
 		label.setMaximumSize(new Dimension(600,50));
 		label.setAlignmentX(LEFT_ALIGNMENT);
+		label.addMouseListener(new MouseAdapter() {
+			
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if (e.getClickCount() > 1) {
+				label.setForeground(Color.BLACK);
+			}
+		}
+		});
 		playPanel.add(label);
 		playPanel.add(Box.createHorizontalGlue());
 		JButton playButton = new JButton(new ImageIcon(this.getClass().getResource("/play.png")));
 		playButton.setFocusable(false);
 		playButton.setActionCommand(PLAY + index);
 		playButton.addActionListener(this);
+		playButton.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent arg0) {
+				label.setForeground(Color.RED);
+			}});
 		
 		playButton.setPreferredSize(new Dimension(50,50));
 		playButton.setMinimumSize(new Dimension(50,50));

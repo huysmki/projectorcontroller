@@ -15,6 +15,11 @@ public class Client extends ValueObject {
 	private int port;
 	@EditableProperty(name = "Type", type=Type.CLIENT_TYPE)
 	private ClientType type = ClientType.PROJECTOR;
+	@EditableProperty(name = "Send Retry Times")
+	private int sendRetryTimes = 1;
+	@EditableProperty(name = "Wait Time Between Retries (ms)")
+	private int waitTimeBetweenRetries = 20;
+
 	
 	public Client() {
 	}
@@ -69,5 +74,21 @@ public class Client extends ValueObject {
 
 	public ClientType getType() {
 		return type;
+	}
+
+	public void setSendRetryTimes(int sendRetryTimes) {
+		this.sendRetryTimes = sendRetryTimes;
+	}
+
+	public int getSendRetryTimes() {
+		return sendRetryTimes;
+	}
+
+	public void setWaitTimeBetweenRetries(int waitTimeBetweenRetries) {
+		this.waitTimeBetweenRetries = waitTimeBetweenRetries;
+	}
+
+	public int getWaitTimeBetweenRetries() {
+		return waitTimeBetweenRetries;
 	}
 }
