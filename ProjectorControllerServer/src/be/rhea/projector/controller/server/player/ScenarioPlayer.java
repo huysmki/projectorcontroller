@@ -196,6 +196,11 @@ public class ScenarioPlayer implements Runnable {
 						Client client = getClientForId(clients, clientId);
 						sendSimpleProtocolCommand(client, command, action.getParameters());
 					}
+					try {
+						Thread.sleep(20);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
 			} while (repeatScenePart && (repeatCount < 0 || repeatCount-- > 0));
 		}
