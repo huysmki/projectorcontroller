@@ -52,6 +52,7 @@ public class ArtNetProtocolUDPClient {
 		
 		DatagramPacket packet = new DatagramPacket(dataBytes, dataBytes.length, InetAddress.getByAddress(inetaddress), port);
 		datagramSocket.send(packet);
+		datagramSocket.close();
 		//System.out.println("Sending " + dataBytes + " to " + InetAddress.getByAddress(inetaddress).getHostAddress() + ":" + port);
 	}
 }

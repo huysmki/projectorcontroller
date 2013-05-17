@@ -4,7 +4,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/ProjectorControllerCommon"/>
 	<classpathentry kind="lib" path="lib/custom.jar"/>
 	<classpathentry kind="lib" path="lib/jmf.jar"/>
-	<classpathentry kind="lib" path="lib/jmf.properties"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
