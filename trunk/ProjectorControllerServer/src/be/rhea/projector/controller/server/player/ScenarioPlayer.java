@@ -1,9 +1,16 @@
 package be.rhea.projector.controller.server.player;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javazoom.jl.decoder.JavaLayerException;
+
+import be.rhea.player.MP3Player;
+import be.rhea.player.MP3PlayerListener;
 import be.rhea.projector.controller.server.ProjectorControllerServer;
 import be.rhea.projector.controller.server.player.StateChangedEvent.State;
 import be.rhea.projector.controller.server.scenario.Client;
@@ -16,8 +23,10 @@ import be.rhea.projector.controller.server.scenario.actions.AbstractArtNetClient
 import be.rhea.projector.controller.server.scenario.actions.AbstractProjectorClientAction;
 import be.rhea.projector.controller.server.scenario.actions.ArtNetAction;
 import be.rhea.projector.controller.server.scenario.actions.ManualAcknownledgeAction;
+import be.rhea.projector.controller.server.scenario.actions.PlayMP3Action;
 import be.rhea.projector.controller.server.scenario.actions.RepeatScenePartAction;
 import be.rhea.projector.controller.server.scenario.actions.SleepAction;
+import be.rhea.projector.controller.server.util.StatusHolder;
 import be.rhea.remote.PCP;
 import be.rhea.remote.client.ArtNetProtocolUDPWithRetryClient;
 import be.rhea.remote.client.SimpleProtocolClient;
@@ -29,8 +38,10 @@ public class ScenarioPlayer implements Runnable {
 	private static int sceneIdToPlay;
 	private static boolean isPlaying = false;
 	private static boolean isPaused = false;
+	private static boolean isMP3Playing  = false;
 	private static Thread playerThread;
 	private static List<StateChangedListener> stateChangeListeners = new ArrayList<StateChangedListener>();
+	private static MP3Player mp3Player; 
 	
 	//TODO implement Listener to track changing of events
 	private ScenarioPlayer() {
@@ -72,8 +83,14 @@ public class ScenarioPlayer implements Runnable {
 		isPaused = !isPaused;
 		if (isPaused) {
 			fireStateChangeListeners(new StateChangedEvent(State.PAUSE));
+			if (mp3Player != null && isMP3Playing) {
+				mp3Player.pause();
+			}
 		} else {
 			fireStateChangeListeners(new StateChangedEvent(State.PLAY));
+			if (mp3Player != null && isMP3Playing) {
+				mp3Player.resume();
+			}
 		}
 		return true;
 	}
@@ -84,6 +101,12 @@ public class ScenarioPlayer implements Runnable {
 		}
 		isPaused = false;
 		isPlaying = false;
+		
+		if (mp3Player != null && isMP3Playing) {
+			mp3Player.stop();
+			isMP3Playing = false;
+		}
+
 		List<Integer> artNetData = new ArrayList<Integer>();
 		for (int i = 0; i < 512; i++) {
 			artNetData.add(new Integer(0));
@@ -178,6 +201,37 @@ public class ScenarioPlayer implements Runnable {
 								ProjectorControllerServer.showError(e);
 							}
 						}
+					} else if (action instanceof PlayMP3Action) {
+						String fileName = ((PlayMP3Action) action).getFileName();
+						if (mp3Player != null) {
+							mp3Player.close();
+						}
+						try {
+							mp3Player = new MP3Player(new FileInputStream(StatusHolder.getInstance().getMediaDir() + File.separator + fileName));
+							mp3Player.addMP3PlayerListener(new MP3PlayerListener() {
+								
+								public void playbackStarted() {
+								}
+								
+								public void playbackFinished() {
+									isMP3Playing = false;
+								}
+							});
+							isMP3Playing = true;
+							mp3Player.play();
+							while (isPlaying && isMP3Playing && ((PlayMP3Action) action).isWaitUntilEnd()) {
+								try {
+									Thread.sleep(100);
+								} catch (InterruptedException e) {
+									ProjectorControllerServer.showError(e);
+								}
+							}
+						} catch (FileNotFoundException e) {
+							ProjectorControllerServer.showError(e);
+						} catch (JavaLayerException e) {
+							ProjectorControllerServer.showError(e);
+						}
+						
 					} else if (action instanceof ManualAcknownledgeAction) {
 						ManualAcknownledgeAction manualAcknowledgeAction = (ManualAcknownledgeAction) action; 
 						String message = manualAcknowledgeAction.getMessage()!= null?manualAcknowledgeAction.getMessage():"Please Aknowledge";
