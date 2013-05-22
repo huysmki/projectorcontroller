@@ -39,6 +39,7 @@ public class ScenarioPlayer implements Runnable {
 	private static boolean isPlaying = false;
 	private static boolean isPaused = false;
 	private static boolean isMP3Playing  = false;
+	private static boolean restart  = false;
 	private static Thread playerThread;
 	private static List<StateChangedListener> stateChangeListeners = new ArrayList<StateChangedListener>();
 	private static MP3Player mp3Player; 
@@ -90,6 +91,7 @@ public class ScenarioPlayer implements Runnable {
 			fireStateChangeListeners(new StateChangedEvent(State.PLAY));
 			if (mp3Player != null && isMP3Playing) {
 				mp3Player.resume();
+				fireStateChangeListeners(new StateChangedEvent(State.PLAY_MP3));
 			}
 		}
 		return true;
@@ -123,6 +125,31 @@ public class ScenarioPlayer implements Runnable {
 		fireStateChangeListeners(new StateChangedEvent(State.STOP));
 		return true;
 	}
+	
+	public static void restart() {
+		if (!isMP3Playing) {
+			return;
+		}
+		restart = true;
+		if (mp3Player != null) {
+			fireStateChangeListeners(new StateChangedEvent(State.STOP_MP3, ""));
+			mp3Player.stop();
+			mp3Player.close();
+		}
+		isMP3Playing = false;
+	}
+
+	public static void skip() {
+		if (!isMP3Playing) {
+			return;
+		}
+		if (mp3Player != null) {
+			fireStateChangeListeners(new StateChangedEvent(State.STOP_MP3, ""));
+			mp3Player.stop();
+			mp3Player.close();
+		}
+		isMP3Playing = false;
+	}	
 
 	private static Client getClientForId(List<Client> clients, int clientId) {
 		for (Client client : clients) {
@@ -206,31 +233,7 @@ public class ScenarioPlayer implements Runnable {
 						if (mp3Player != null) {
 							mp3Player.close();
 						}
-						try {
-							mp3Player = new MP3Player(new FileInputStream(StatusHolder.getInstance().getMediaDir() + File.separator + fileName));
-							mp3Player.addMP3PlayerListener(new MP3PlayerListener() {
-								
-								public void playbackStarted() {
-								}
-								
-								public void playbackFinished() {
-									isMP3Playing = false;
-								}
-							});
-							isMP3Playing = true;
-							mp3Player.play();
-							while (isPlaying && isMP3Playing && ((PlayMP3Action) action).isWaitUntilEnd()) {
-								try {
-									Thread.sleep(100);
-								} catch (InterruptedException e) {
-									ProjectorControllerServer.showError(e);
-								}
-							}
-						} catch (FileNotFoundException e) {
-							ProjectorControllerServer.showError(e);
-						} catch (JavaLayerException e) {
-							ProjectorControllerServer.showError(e);
-						}
+						playMP3(action, fileName);
 						
 					} else if (action instanceof ManualAcknownledgeAction) {
 						ManualAcknownledgeAction manualAcknowledgeAction = (ManualAcknownledgeAction) action; 
@@ -261,6 +264,42 @@ public class ScenarioPlayer implements Runnable {
 		isPlaying = false;
 		isPaused = false;
 		fireStateChangeListeners(new StateChangedEvent(State.STOP));
+	}
+
+	private void playMP3(AbstractAction action, String fileName) {
+		do {
+			restart = false;
+			try {
+				mp3Player = new MP3Player(new FileInputStream(StatusHolder.getInstance().getMediaDir() + File.separator + fileName));
+				mp3Player.addMP3PlayerListener(new MP3PlayerListener() {
+					
+					public void playbackStarted() {
+					}
+					
+					public void playbackFinished() {
+						isMP3Playing = false;
+						fireStateChangeListeners(new StateChangedEvent(State.STOP_MP3, ""));
+					}
+				});
+				isMP3Playing = true;
+				mp3Player.play();
+	
+				if (((PlayMP3Action) action).isWaitUntilEnd()) {
+					fireStateChangeListeners(new StateChangedEvent(State.PLAY_MP3, action));
+					while (isPlaying && isMP3Playing) {
+						try {
+							Thread.sleep(100);
+						} catch (InterruptedException e) {
+							ProjectorControllerServer.showError(e);
+						}
+					}
+				}
+			} catch (FileNotFoundException e) {
+				ProjectorControllerServer.showError(e);
+			} catch (JavaLayerException e) {
+				ProjectorControllerServer.showError(e);
+			}
+		} while (restart);
 	}
 
 	public static boolean isPlaying() {
@@ -298,4 +337,6 @@ public class ScenarioPlayer implements Runnable {
 		}
 		
 	}
+
+
 }
