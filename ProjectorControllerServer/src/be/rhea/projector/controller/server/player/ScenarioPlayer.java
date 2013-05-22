@@ -281,10 +281,10 @@ public class ScenarioPlayer implements Runnable {
 						fireStateChangeListeners(new StateChangedEvent(State.STOP_MP3, ""));
 					}
 				});
-				isMP3Playing = true;
 				mp3Player.play();
 	
 				if (((PlayMP3Action) action).isWaitUntilEnd()) {
+					isMP3Playing = true;
 					fireStateChangeListeners(new StateChangedEvent(State.PLAY_MP3, action));
 					while (isPlaying && isMP3Playing) {
 						try {
