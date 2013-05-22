@@ -14,7 +14,7 @@
             <fileset dir="../../ProjectorControllerClient/bin"/>
             <zipfileset excludes="META-INF/*.SF" src="../../ProjectorControllerClient/lib/custom.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../../ProjectorControllerClient/lib/jmf.jar"/>        	
-            <zipfileset excludes="META-INF/*.SF" src="../../ProjectorControllerClient/lib/jl1.0.1.jar"/>        	
+            <zipfileset excludes="META-INF/*.SF" src="../../ProjectorControllerServer/lib/jl1.0.1.jar"/>        	
             </jar>
     </target>
 </project>
