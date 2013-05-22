@@ -77,6 +77,7 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 			
 			JScrollPane pauseStopPanel = createPauseStopPanel();
 			rightPanel.add(pauseStopPanel, BorderLayout.NORTH);
+			pauseStopPanel.setPreferredSize(new Dimension(pauseStopPanel.getWidth(), 300));
 			
 			JScrollPane loggingPanel = createLoggingPanel();
 			rightPanel.add(loggingPanel, BorderLayout.CENTER);
@@ -371,6 +372,7 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 				pauseButton.setEnabled(false);
 				stopButton.setEnabled(false);				
 		}
+		changePauseButtonImage();
 	}
 	
 	public void stateChanged(StateChangedEvent e) {
@@ -386,6 +388,15 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 			statusLabel.setText("Pause : " + e.getMessage());
 		} else if (e.getNewState().equals(State.ACTION_EXECUTED)) {
 			((DefaultListModel)loggingList.getModel()).addElement(e.getAction());
+		}
+		changePauseButtonImage();
+	}
+	
+	private void changePauseButtonImage() {
+		if (ScenarioPlayer.isPaused()) {
+			pauseButton.setIcon(new ImageIcon(this.getClass().getResource("/play.png")));
+		} else {
+			pauseButton.setIcon(new ImageIcon(this.getClass().getResource("/pause.png")));
 		}
 	}
 	
