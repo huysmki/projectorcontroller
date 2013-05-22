@@ -6,7 +6,7 @@ public class StateChangedEvent {
 	private final State state;
 	private final String message;
 	private AbstractAction action;
-	public enum State {PLAY, PAUSE, STOP, MANUAL_ACKNOWLEDGE, ACTION_EXECUTED};
+	public enum State {PLAY, PLAY_MP3, PAUSE, STOP, STOP_MP3, MANUAL_ACKNOWLEDGE, ACTION_EXECUTED};
 	
 	public StateChangedEvent(State state) {
 		this.state = state;

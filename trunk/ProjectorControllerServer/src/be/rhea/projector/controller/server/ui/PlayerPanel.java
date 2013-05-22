@@ -51,11 +51,15 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 	private static final String STOP = "STOP";
 	private static final String PAUSE = "PAUSE";
 	private static final String PLAY = "PLAY:";
+	private static final String RESTART = "RESTART:";
+	private static final String SKIP = "SKIP:";
 	private static final long serialVersionUID = 1L;
 	private List<ClientPanel> clientPanels = new ArrayList<ClientPanel>();
 	private List<ArtNetPreviewer> artNetPanels = new ArrayList<ArtNetPreviewer>();
 	private JButton stopButton;
 	private JButton pauseButton;
+	private JButton restartButton;
+	private JButton skipButton;
 	private JLabel statusLabel;
 	private String mediaDir;
 	private JList loggingList;
@@ -178,31 +182,56 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 		
 		stopPausePanel.add(Box.createHorizontalGlue());
 		
+		
 		pauseButton = new JButton(new ImageIcon(this.getClass().getResource("/pause.png")));
 		pauseButton.setFocusable(false);
 		pauseButton.setActionCommand(PAUSE);
 		pauseButton.addActionListener(this);
-		pauseButton.setPreferredSize(new Dimension(150,150));
-		pauseButton.setMinimumSize(new Dimension(150,150));
-		pauseButton.setMaximumSize(new Dimension(150,150));
+		pauseButton.setPreferredSize(new Dimension(100,100));
+		pauseButton.setMinimumSize(new Dimension(100,100));
+		pauseButton.setMaximumSize(new Dimension(100,100));
 		pauseButton.setEnabled(false);
 		stopPausePanel.add(pauseButton);
 		
 		
-		stopPausePanel.add(Box.createRigidArea(new Dimension(40,0)));
+		stopPausePanel.add(Box.createRigidArea(new Dimension(20,0)));
 
 		stopButton = new JButton(new ImageIcon(this.getClass().getResource("/stop.png")));
 		stopButton.setFocusable(false);
 		stopButton.setActionCommand(STOP);
 		stopButton.addActionListener(this);
-		stopButton.setPreferredSize(new Dimension(150,150));
-		stopButton.setMinimumSize(new Dimension(150,150));
-		stopButton.setMaximumSize(new Dimension(150,150));
+		stopButton.setPreferredSize(new Dimension(100,100));
+		stopButton.setMinimumSize(new Dimension(100,100));
+		stopButton.setMaximumSize(new Dimension(100,100));
 		stopButton.setEnabled(false);
 		stopPausePanel.add(stopButton);
-		stopPausePanel.add(Box.createHorizontalGlue());
 
 		startStopPanel.add(stopPausePanel);
+
+		stopPausePanel.add(Box.createRigidArea(new Dimension(40,0)));		
+		
+		restartButton = new JButton(new ImageIcon(this.getClass().getResource("/restart.png")));
+		restartButton.setFocusable(false);
+		restartButton.setActionCommand(RESTART);
+		restartButton.addActionListener(this);
+		restartButton.setPreferredSize(new Dimension(100,100));
+		restartButton.setMinimumSize(new Dimension(100,100));
+		restartButton.setMaximumSize(new Dimension(100,100));
+		restartButton.setEnabled(false);
+		stopPausePanel.add(restartButton);
+
+		stopPausePanel.add(Box.createRigidArea(new Dimension(20,0)));
+		
+		skipButton = new JButton(new ImageIcon(this.getClass().getResource("/skip.png")));
+		skipButton.setFocusable(false);
+		skipButton.setActionCommand(SKIP);
+		skipButton.addActionListener(this);
+		skipButton.setPreferredSize(new Dimension(100,100));
+		skipButton.setMinimumSize(new Dimension(100,100));
+		skipButton.setMaximumSize(new Dimension(100,100));
+		skipButton.setEnabled(false);
+		stopPausePanel.add(skipButton);
+		stopPausePanel.add(Box.createHorizontalGlue());
 
 		startStopPanel.add(Box.createRigidArea(new Dimension(0,30)));
 		
@@ -371,6 +400,10 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 				ScenarioPlayer.stop();
 				pauseButton.setEnabled(false);
 				stopButton.setEnabled(false);				
+		} else if (RESTART.equals(actionEvent.getActionCommand())) {
+			ScenarioPlayer.restart();
+		} else if (SKIP.equals(actionEvent.getActionCommand())) {
+			ScenarioPlayer.skip();
 		}
 		changePauseButtonImage();
 	}
@@ -379,8 +412,17 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 		if (e.getNewState().equals(State.STOP)) {
 			pauseButton.setEnabled(false);
 			stopButton.setEnabled(false);
+			restartButton.setEnabled(false);
+			skipButton.setEnabled(false);
 			statusLabel.setText("");
+		} else if (e.getNewState().equals(State.STOP_MP3)) {
+			restartButton.setEnabled(false);
+			skipButton.setEnabled(false);
 		} else if (e.getNewState().equals(State.PLAY)) {
+			statusLabel.setText("Playing");
+		} else if (e.getNewState().equals(State.PLAY_MP3)) {
+			restartButton.setEnabled(true);
+			skipButton.setEnabled(true);
 			statusLabel.setText("Playing");
 		} else if (e.getNewState().equals(State.PAUSE)) {
 			statusLabel.setText("Paused");
