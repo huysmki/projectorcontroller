@@ -32,7 +32,9 @@ public class SimpleProtocolUDPWithRetryServer extends SimpleProtocolServer imple
 	public void stop() throws IOException {
 		running = false;
 		serverThread = null;
-		datagramSocket.close();
+		if (datagramSocket != null) {
+			datagramSocket.close();
+		}
 	}
 	
 	public void run() {
