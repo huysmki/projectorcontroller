@@ -10,7 +10,8 @@ import be.rhea.remote.PCP;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-public class SimpleProtocolUDPWithRetryServer extends SimpleProtocolServer implements Runnable {
+public class SimpleProtocolUDPWithRetryServer extends SimpleProtocolServer
+		implements Runnable {
 
 	private int port;
 	private Thread serverThread;
@@ -24,7 +25,7 @@ public class SimpleProtocolUDPWithRetryServer extends SimpleProtocolServer imple
 	public void start() throws IOException {
 		datagramSocket = new DatagramSocket(port);
 		datagramSocket.setSoTimeout(0);
-	
+
 		serverThread = new Thread(this);
 		serverThread.start();
 	}
@@ -36,29 +37,31 @@ public class SimpleProtocolUDPWithRetryServer extends SimpleProtocolServer imple
 			datagramSocket.close();
 		}
 	}
-	
+
 	public void run() {
 		byte[] oldPacket = null;
-		try {
-			while (running) {
+		while (running) {
+			try {
 				byte[] buffer = new byte[1024];
-				DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+				DatagramPacket packet = new DatagramPacket(buffer,
+						buffer.length);
 				datagramSocket.receive(packet);
 
-				if (oldPacket == null || !Arrays.equals(packet.getData(), oldPacket)) {
+				if (oldPacket == null
+						|| !Arrays.equals(packet.getData(), oldPacket)) {
 					Thread sockethandletThread = new Thread(new SocketHandler(
 							packet));
 					sockethandletThread.start();
 				}
 				oldPacket = packet.getData();
 
-			}
-		} catch (IOException e) {
-			if (running) {
-				logger.log(Level.SEVERE,
-						   "Exception occurred when starting SimpleProtocolServer",
-						   e);
-				throw new RuntimeException(e);
+			} catch (IOException e) {
+				if (running) {
+					logger.log(
+							Level.SEVERE,
+							"Exception occurred when starting SimpleProtocolServer",
+							e);
+				}
 			}
 		}
 
@@ -74,19 +77,22 @@ public class SimpleProtocolUDPWithRetryServer extends SimpleProtocolServer imple
 
 		public void run() {
 			try {
-				String line = new String(packet.getData(), 0, packet.getLength());
+				String line = new String(packet.getData(), 0,
+						packet.getLength());
 				String[] lineParts = line.split(PCP.PARAMETER_DELIMITER);
 				SimpleProtocolServerCommand command = (SimpleProtocolServerCommand) commandMap
 						.get(lineParts[0]);
 				String[] parameters = null;
 				if (lineParts.length > 1) {
 					parameters = new String[lineParts.length - 1];
-					System.arraycopy(lineParts, 1, parameters, 0, lineParts.length - 1);
+					System.arraycopy(lineParts, 1, parameters, 0,
+							lineParts.length - 1);
 				}
-				 
+
 				if (command != null) {
 					if (command instanceof SimpleProtocolServerExecuteCommand) {
-						((SimpleProtocolServerExecuteCommand) command).execute(parameters);
+						((SimpleProtocolServerExecuteCommand) command)
+								.execute(parameters);
 					} else if (command instanceof SimpleProtocolServerStreamingCommand) {
 						throw new NotImplementedException();
 					}
