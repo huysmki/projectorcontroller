@@ -27,6 +27,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
@@ -67,7 +68,7 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 	public PlayerPanel(Scenario scenario) {
 		this.setLayout(new BorderLayout());
 		if (scenario != null) {
-			JPanel panel = new JPanel(); 
+			JSplitPane panel = new JSplitPane(); 
 			panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 			mediaDir = StatusHolder.getInstance().getMediaDir();
 			mediaDir = JOptionPane.showInputDialog(this, "Please provide media directory : ", mediaDir);
@@ -75,7 +76,7 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 			StatusHolder.getInstance().setMediaDir(mediaDir);
 
 			JScrollPane createPlayersPanel = createPlayersPanel(scenario);
-			panel.add(createPlayersPanel);
+			panel.setLeftComponent(createPlayersPanel);
 			
 			JPanel rightPanel = new JPanel(new BorderLayout());
 			
@@ -86,7 +87,7 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 			JScrollPane loggingPanel = createLoggingPanel();
 			rightPanel.add(loggingPanel, BorderLayout.CENTER);
 			
-			panel.add(rightPanel);
+			panel.setRightComponent(rightPanel);
 			
 			
 			this.add(panel, BorderLayout.CENTER);
@@ -344,10 +345,12 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 		JPanel playPanel = new JPanel();
 		playPanel.setLayout(new BoxLayout(playPanel, BoxLayout.X_AXIS));
 		playPanel.add(Box.createRigidArea(new Dimension(5,0)));
+		final JButton playButton = new JButton(new ImageIcon(this.getClass().getResource("/play.png")));
+
 		final JLabel label = new JLabel(scene.getName());
 		label.setFont(new Font("Arial", Font.PLAIN, 25));
-		label.setPreferredSize(new Dimension(600,50));
-		label.setMinimumSize(new Dimension(100,50));
+		label.setPreferredSize(new Dimension(350,50));
+		label.setMinimumSize(new Dimension(250,50));
 		label.setMaximumSize(new Dimension(600,50));
 		label.setAlignmentX(LEFT_ALIGNMENT);
 		label.addMouseListener(new MouseAdapter() {
@@ -356,12 +359,15 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 		public void mouseClicked(MouseEvent e) {
 			if (e.getClickCount() > 1) {
 				label.setForeground(Color.BLACK);
+				playButton.setIcon(new ImageIcon(this.getClass().getResource("/play.png")));
+				
 			}
 		}
 		});
 		playPanel.add(label);
 		playPanel.add(Box.createHorizontalGlue());
-		JButton playButton = new JButton(new ImageIcon(this.getClass().getResource("/play.png")));
+
+		
 		playButton.setFocusable(false);
 		playButton.setActionCommand(PLAY + index);
 		playButton.addActionListener(this);
@@ -369,6 +375,7 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 
 			public void actionPerformed(ActionEvent arg0) {
 				label.setForeground(Color.RED);
+				playButton.setIcon(new ImageIcon(this.getClass().getResource("/played.png")));
 			}});
 		
 		playButton.setPreferredSize(new Dimension(50,50));
@@ -377,6 +384,11 @@ public class PlayerPanel extends JPanel implements ActionListener, StateChangedL
 		playButton.setAlignmentX(RIGHT_ALIGNMENT);
 		playPanel.add(playButton);
 		playPanel.add(Box.createRigidArea(new Dimension(20,0)));
+		if (index%2 == 0) {
+			playPanel.setBackground(Color.GRAY);
+		} else {
+			playPanel.setBackground(Color.LIGHT_GRAY);
+		}
 		
 		return playPanel;
 	}
